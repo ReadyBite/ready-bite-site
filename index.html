@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready Bite</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .meal-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+        .meal { border: 1px solid #ccc; padding: 10px; width: 200px; }
+        .cart { margin-top: 20px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Ready Bite</h1>
+    <div class="meal-container" id="mealContainer"></div>
+    <div class="cart">
+        <h2>Cart</h2>
+        <ul id="cartList"></ul>
+        <p>Total: $<span id="totalPrice">0.00</span></p>
+        <button onclick="sendOrder()">Submit Order</button>
+    </div>
+
+    <script>
+        const meals = [
+            { name: "Grilled Chicken", price: 10 },
+            { name: "Salmon Bowl", price: 12 },
+            { name: "Beef Stir Fry", price: 11 },
+            { name: "Vegan Wrap", price: 9 },
+            { name: "Turkey Meatballs", price: 10 },
+            { name: "BBQ Ribs", price: 13 },
+            { name: "Shrimp Pasta", price: 12 },
+            { name: "Chicken Caesar", price: 10 },
+            { name: "Tofu Rice Bowl", price: 9 },
+            { name: "Steak and Veggies", price: 14 },
+            { name: "Pesto Pasta", price: 10 },
+            { name: "Lemon Herb Salmon", price: 12 }
+        ];
+
+        let cart = [];
+
+        function renderMeals() {
+            const container = document.getElementById("mealContainer");
+            meals.forEach((meal, index) => {
+                let mealDiv = document.createElement("div");
+                mealDiv.className = "meal";
+                mealDiv.innerHTML = `
+                    <h3>${meal.name}</h3>
+                    <p>$${meal.price.toFixed(2)}</p>
+                    <input type="number" id="meal-${index}" min="1" placeholder="Qty">
+                    <button onclick="addToCart(${index})">Add to Cart</button>
+                `;
+                container.appendChild(mealDiv);
+            });
+        }
+
+        function addToCart(index) {
+            const quantityInput = document.getElementById(`meal-${index}`);
+            let quantity = parseInt(quantityInput.value);
+            if (isNaN(quantity) || quantity <= 0) return;
+
+            let meal = meals[index];
+            let existingItem = cart.find(item => item.name === meal.name);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+            }
+            quantityInput.value = "";
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartList = document.getElementById("cartList");
+            const totalPriceElement = document.getElementById("totalPrice");
+            cartList.innerHTML = "";
+            let total = 0;
+
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                let li = document.createElement("li");
+                li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+                cartList.appendChild(li);
+            });
+            totalPriceElement.innerText = total.toFixed(2);
+        }
+
+        function sendOrder() {
+            if (cart.length === 0) {
+                alert("Your cart is empty.");
+                return;
+            }
+            let orderDetails = cart.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
+            let subject = "New Ready Bite Order";
+            let body = encodeURIComponent(`Order Details:\n${orderDetails}\nTotal: $${document.getElementById("totalPrice").innerText}`);
+            window.location.href = `mailto:readybitemeals@gmail.com?subject=${subject}&body=${body}`;
+        }
+
+        renderMeals();
+    </script>
+</body>
+</html>
