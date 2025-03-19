@@ -122,29 +122,23 @@
       .meal-container {
         grid-template-columns: repeat(2, 1fr);
       }
-      /* Hide desktop nav on mobile */
-      .desktop-nav {
-        display: none;
-      }
-      .menu-button {
-        display: block;
-      }
+      .desktop-nav { display: none; }
+      .menu-button { display: block; }
     }
     /* Meal Card */
     .meal {
       position: relative;
       width: 220px;
-      /* entire card is clickable */
-      cursor: pointer;
       background-color: #fff;
       border: 1px solid #ccc;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
       transition: transform 0.2s;
+      cursor: pointer;
     }
     .meal:hover {
       transform: scale(1.02);
     }
-    /* Always show the banner at the top */
+    /* Nutrition Banner always visible */
     .nutrition-banner {
       width: 220px;
       background-color: #ddd;
@@ -153,6 +147,7 @@
       font-weight: bold;
       padding: 4px 0;
     }
+    /* Image container for fixed-size image and overlay */
     .image-container {
       position: relative;
       width: 220px;
@@ -165,31 +160,31 @@
       object-fit: cover;
       display: block;
     }
-    /* Desktop Hover Overlay */
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 220px;
-      height: 220px;
-      background-color: rgba(128,128,128,0.5);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      padding: 10px;
-      box-sizing: border-box;
-    }
+    /* Overlay: only on desktop (using hover) */
     @media (hover: hover) {
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 220px;
+        height: 220px;
+        background-color: rgba(128,128,128,0.5);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        padding: 10px;
+        box-sizing: border-box;
+      }
       .meal:hover .overlay {
         opacity: 1;
       }
     }
-    /* Hide overlay on mobile entirely */
+    /* On mobile, hide overlay */
     @media (max-width: 768px) {
       .overlay {
         display: none;
@@ -198,12 +193,14 @@
     .overlay h3 {
       margin-bottom: 5px;
       font-weight: bold;
+      font-size: 1em;
     }
     .overlay p {
       margin: 3px 0;
       font-weight: normal;
+      font-size: 0.85em;
     }
-    /* Basic meal info below image */
+    /* Meal Info below image */
     .meal-info {
       text-align: center;
       padding: 10px;
@@ -215,6 +212,21 @@
     .meal-info p {
       margin: 5px 0;
       font-size: 0.9em;
+    }
+    /* Quick Add and View Details Buttons */
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 0 10px 10px;
+    }
+    .button-container button {
+      flex: 1;
+      padding: 8px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
     /* Cart Section */
     .cart-section {
@@ -243,6 +255,7 @@
       cursor: pointer;
       border-radius: 3px;
     }
+    /* Feedback and Contact Buttons */
     .feedback-button-container, .contact-button-container {
       text-align: center;
       margin: 40px 0 0 0;
@@ -290,7 +303,6 @@
     <button onclick="goToOrderPage()">Go to Checkout</button>
   </div>
   
-  <!-- Feedback and Contact Buttons -->
   <div class="feedback-button-container">
     <button onclick="window.location.href='feedback.html'">Leave Us Feedback</button>
   </div>
@@ -305,71 +317,79 @@
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
-    // Sample meals array with macros & shortDesc for overlay
+    // Recommended daily values for reference (not displayed here)
+    const recommended = {
+      calories: 2000,
+      fat: 70,
+      protein: 50,
+      carbs: 300
+    };
+    
+    // Sample meals array with macros and shortDesc for overlay
     const meals = [
       {
         name: "Beef Spaghetti",
         price: 10,
         image: "spaghetti_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Rich beef sauce over spaghetti noodles."
       },
       {
         name: "Asian Chicken and Rice w/ Veggie Mix",
         price: 10,
         image: "asian_chicken_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Savory sauce with chicken and mixed veggies."
       },
       {
         name: "Bulgogi Beef and Rice w/ Veggie Mix",
         price: 10,
         image: "bulgogi_beef_adjusted_cropped_resized.png.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Marinated bulgogi beef with stir-fried vegetables."
       },
       {
         name: "Beef Enchiladas",
         price: 10,
         image: "beef_enchiladas_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Spicy sauce, melted cheese, and tender beef."
       },
       {
         name: "Chicken Enchiladas",
         price: 10,
         image: "chicken_enchiladas_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Melted cheese and seasoned chicken in tortillas."
       },
       {
         name: "Chicken Alfredo",
         price: 10,
         image: "chicken_alfredo_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Creamy alfredo sauce with tender chicken."
       },
       {
         name: "Smoked BBQ Chicken w/ Potatoes",
         price: 10,
         image: "smoked_chicken_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Smoked chicken with seasoned potatoes."
       },
       {
         name: "Chicken Fajita",
         price: 10,
         image: "chicken_fajita_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
         shortDesc: "Bell peppers, onions, and seasoned chicken."
       },
       {
         name: "Smoked BBQ Chicken Bulk",
         price: 12,
+        bulkOptions: [2, 4, 6, 8, 10],
         image: "smoked_chicken_adjusted_cropped_resized.png",
-        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
-        shortDesc: "Bulk smoked BBQ chicken with special seasoning.",
-        bulkOptions: [2, 4, 6, 8, 10]
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 },
+        shortDesc: "Bulk smoked BBQ chicken with special seasoning."
       }
     ];
     
@@ -381,20 +401,22 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        // Entire .meal is clickable
-        mealDiv.onclick = function() {
-          viewDetails(index);
+        // Make the entire meal card clickable (except for Quick Add buttons)
+        mealDiv.onclick = function(e) {
+          if (e.target.tagName.toLowerCase() !== 'button' && e.target.tagName.toLowerCase() !== 'input' && e.target.tagName.toLowerCase() !== 'select') {
+            viewDetails(index);
+          }
         };
         
         mealDiv.innerHTML = `
           <div class="nutrition-banner">
-            Cal: 500 F: 20g C:40g P:40g
+            Cal: 500 F:20g C:40g P:40g
           </div>
           <div class="image-container">
             <img src="${meal.image}" alt="${meal.name}">
             <div class="overlay">
               <h3>${meal.name}</h3>
-              <p>${meal.macros}</p>
+              <p>${meal.macros.calories} Cal, ${meal.macros.fat}g Fat, ${meal.macros.carbs}g Carbs, ${meal.macros.protein}g Protein</p>
               <p>${meal.shortDesc}</p>
             </div>
           </div>
@@ -402,13 +424,25 @@
             <h3>${meal.name}</h3>
             <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
           </div>
+          <div class="button-container">
+            <button onclick="showQtySection(event, ${index})">Quick Add</button>
+            <button onclick="viewDetails(${index})">View Details</button>
+          </div>
         `;
-        
         container.appendChild(mealDiv);
       });
     }
     
-    // Cart Functions
+    // Prevent propagation when clicking on Quick Add controls
+    function showQtySection(e, index) {
+      e.stopPropagation();
+      // You can implement the Quick Add flow here if desired (e.g., show a modal with quantity, etc.)
+      // For now, we'll simply alert the user.
+      alert("Quick Add: Implement quantity selection here if desired.");
+      // Optionally, you could call a function like quickAdd(index) after quantity is selected.
+    }
+    
+    // Global Cart Functions
     function updateCart() {
       const cartList = document.getElementById("cartList");
       const totalPriceElement = document.getElementById("totalPrice");
@@ -423,15 +457,18 @@
       totalPriceElement.innerText = total.toFixed(2);
       localStorage.setItem("cartData", JSON.stringify(cart));
     }
+    
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCart();
       updateCartDropdown();
     }
+    
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
     }
+    
     function updateCartDropdown() {
       const loadedCart = loadCart();
       let totalItems = 0;
@@ -452,9 +489,11 @@
         });
       }
     }
+    
     function viewDetails(index) {
       window.location.href = "product.html?id=" + index;
     }
+    
     function goToOrderPage() {
       window.location.href = "order.html";
     }
