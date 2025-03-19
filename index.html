@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ready Bite - Main</title>
   <style>
+    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -43,7 +44,7 @@
       color: #333;
       font-size: 1.2em;
     }
-    /* Mobile Menu Button and Dropdown */
+    /* Mobile Menu Button & Dropdown */
     .menu-button {
       display: none;
       background-color: #4CAF50;
@@ -160,7 +161,7 @@
       object-fit: cover;
       display: block;
     }
-    /* Overlay: only on desktop (using hover) */
+    /* Overlay for desktop hover */
     @media (hover: hover) {
       .overlay {
         position: absolute;
@@ -184,11 +185,9 @@
         opacity: 1;
       }
     }
-    /* On mobile, hide overlay */
+    /* Hide overlay on mobile */
     @media (max-width: 768px) {
-      .overlay {
-        display: none;
-      }
+      .overlay { display: none; }
     }
     .overlay h3 {
       margin-bottom: 5px;
@@ -213,7 +212,26 @@
       margin: 5px 0;
       font-size: 0.9em;
     }
-    /* Quick Add and View Details Buttons */
+    /* Quick Add Controls (hidden by default) */
+    .quick-add-controls {
+      display: none;
+      text-align: center;
+      padding: 5px;
+    }
+    .quick-add-controls input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+    .quick-add-controls button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    /* Button Container for Quick Add and View Details */
     .button-container {
       display: flex;
       gap: 10px;
@@ -255,7 +273,7 @@
       cursor: pointer;
       border-radius: 3px;
     }
-    /* Feedback and Contact Buttons */
+    /* Feedback & Contact Buttons */
     .feedback-button-container, .contact-button-container {
       text-align: center;
       margin: 40px 0 0 0;
@@ -317,7 +335,7 @@
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
-    // Recommended daily values for reference (not displayed here)
+    // Recommended daily values (for reference)
     const recommended = {
       calories: 2000,
       fat: 70,
@@ -401,13 +419,14 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        // Make the entire meal card clickable (except for Quick Add buttons)
+        // Make the entire card clickable (except for quick add controls)
         mealDiv.onclick = function(e) {
-          if (e.target.tagName.toLowerCase() !== 'button' && e.target.tagName.toLowerCase() !== 'input' && e.target.tagName.toLowerCase() !== 'select') {
+          if (e.target.tagName.toLowerCase() !== 'button' &&
+              e.target.tagName.toLowerCase() !== 'input' &&
+              e.target.tagName.toLowerCase() !== 'select') {
             viewDetails(index);
           }
         };
-        
         mealDiv.innerHTML = `
           <div class="nutrition-banner">
             Cal: 500 F:20g C:40g P:40g
@@ -428,18 +447,39 @@
             <button onclick="showQtySection(event, ${index})">Quick Add</button>
             <button onclick="viewDetails(${index})">View Details</button>
           </div>
+          <div class="quick-add-controls" id="quickAdd-${index}">
+            <input type="number" id="quantity-${index}" min="1" value="1">
+            <button onclick="quickAdd(${index}, event)">Add</button>
+          </div>
         `;
         container.appendChild(mealDiv);
       });
     }
     
-    // Prevent propagation when clicking on Quick Add controls
+    // Show Quick Add controls and prevent event propagation
     function showQtySection(e, index) {
       e.stopPropagation();
-      // You can implement the Quick Add flow here if desired (e.g., show a modal with quantity, etc.)
-      // For now, we'll simply alert the user.
-      alert("Quick Add: Implement quantity selection here if desired.");
-      // Optionally, you could call a function like quickAdd(index) after quantity is selected.
+      const control = document.getElementById(`quickAdd-${index}`);
+      control.style.display = "block";
+    }
+    
+    // Quick Add: get quantity, add item to cart, then hide controls
+    function quickAdd(index, e) {
+      e.stopPropagation();
+      const quantityInput = document.getElementById(`quantity-${index}`);
+      let quantity = parseInt(quantityInput.value);
+      if (isNaN(quantity) || quantity <= 0) quantity = 1;
+      const meal = meals[index];
+      const existingItem = cart.find(item => item.name === meal.name);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+      }
+      updateCart();
+      updateCartDropdown();
+      alert("Added to cart!");
+      document.getElementById(`quickAdd-${index}`).style.display = "none";
     }
     
     // Global Cart Functions
