@@ -113,7 +113,40 @@
             });
             totalPriceElement.innerText = total.toFixed(2);
         }
+function submitOrder() {
+    if (cart.length === 0) {
+        alert("Your cart is empty. Add meals before submitting an order.");
+        return;
+    }
 
+    let customerName = prompt("Enter your full name:");
+    let customerEmail = prompt("Enter your email:");
+    let customerPhone = prompt("Enter your phone number (000-000-0000):");
+    let customerAddress = prompt("Enter your full address (Street, City, State, ZIP):");
+
+    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
+        alert("All fields are required. Please fill out all information.");
+        return;
+    }
+
+    let orderDetails = cart.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
+    let totalPrice = document.getElementById("totalPrice").innerText;
+    let message = `Name: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\n\nOrder List:\n${orderDetails}\n\nTotal: $${totalPrice}\n\nPayment via Venmo: @Matt-Hanson-107`;
+
+    fetch('https://formspree.io/f/mknljgby', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email: 'readybitemeals@gmail.com',
+            message: message
+        })
+    }).then(response => response.json())
+    .then(data => {
+        alert("Your order has been received! A confirmation email has been sent.");
+        cart = [];
+        updateCart();
+    }).catch(error => alert("Error sending order. Please try again."));
+}
         renderMeals();
     </script>
 </body>
