@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ready Bite - Main</title>
   <style>
@@ -18,6 +18,7 @@
       align-items: center;
       padding: 10px 50px;
       background-color: #eeeeee;
+      position: relative;
     }
     .company-name {
       font-size: 2em;
@@ -27,18 +28,49 @@
       text-decoration: none;
       color: inherit;
     }
-    .header-right {
+    /* Desktop Navigation */
+    .desktop-nav {
       display: flex;
       align-items: center;
-    }
-    nav {
       margin-right: 20px;
     }
-    nav a {
+    .desktop-nav a {
       margin-right: 10px;
       text-decoration: none;
       color: #333;
       font-size: 1.2em;
+    }
+    /* Mobile Menu Button and Dropdown */
+    .menu-button {
+      display: none;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 50px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+      width: 150px;
+    }
+    .mobile-menu a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      border-bottom: 1px solid #eee;
+    }
+    .mobile-menu a:last-child {
+      border-bottom: none;
     }
     /* Global Cart Dropdown */
     .cart-dropdown {
@@ -97,6 +129,13 @@
     @media (max-width: 768px) {
       .meal-container {
         grid-template-columns: repeat(2, 1fr);
+      }
+      /* Hide desktop nav on mobile */
+      .desktop-nav {
+        display: none;
+      }
+      .menu-button {
+        display: block;
       }
     }
     .meal {
@@ -192,17 +231,21 @@
 <body>
   <header>
     <div class="company-name"><a href="index.html">Ready Bite</a></div>
-    <div class="header-right">
-      <nav>
-        <a href="index.html">Home</a>
-        <a href="about.html">About Us</a>
-        <a href="how-it-works.html">How It Works</a>
-      </nav>
-      <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
-        Cart (<span id="cartCount">0</span>)
-        <div class="cart-dropdown-content" id="cartDropdownContent">
-          <ul id="cartDropdownList"></ul>
-        </div>
+    <nav class="desktop-nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="how-it-works.html">How It Works</a>
+    </nav>
+    <button class="menu-button" onclick="toggleMobileMenu()">Menu</button>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="how-it-works.html">How It Works</a>
+    </div>
+    <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+      Cart (<span id="cartCount">0</span>)
+      <div class="cart-dropdown-content" id="cartDropdownContent">
+        <ul id="cartDropdownList"></ul>
       </div>
     </div>
   </header>
@@ -216,13 +259,18 @@
     <button onclick="goToOrderPage()">Go to Checkout</button>
   </div>
   
-  <!-- New Feedback Button at Bottom -->
   <div class="feedback-button-container">
     <button onclick="window.location.href='feedback.html'">Leave Us Feedback</button>
   </div>
   
   <script>
-    // Sample meals array (update nutrition numbers as needed later)
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobileMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+    
+    // Sample meals array
     const meals = [
       { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
       { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
@@ -350,9 +398,7 @@
     function updateCartDropdown() {
       const loadedCart = loadCart();
       let totalItems = 0;
-      loadedCart.forEach(item => {
-        totalItems += item.quantity;
-      });
+      loadedCart.forEach(item => { totalItems += item.quantity; });
       document.getElementById("cartCount").innerText = totalItems;
       const cartDropdownList = document.getElementById("cartDropdownList");
       cartDropdownList.innerHTML = "";
