@@ -71,6 +71,7 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
+    /* Meal Grid */
     .meal-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -96,6 +97,7 @@
     }
     .meal h3 {
       margin: 10px 0 5px 0;
+      text-align: center; /* Center the meal name */
     }
     .meal p {
       margin: 5px 0;
@@ -114,6 +116,7 @@
       border: none;
       cursor: pointer;
     }
+    /* Cart Section */
     .cart-section {
       max-width: 400px;
       margin: 20px auto;
@@ -146,6 +149,22 @@
       padding: 20px;
       background-color: #e8e8e8;
       text-align: left;
+    }
+    /* Responsive for mobile: 2 meals per row */
+    @media (max-width: 768px) {
+      .meal-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* Hide quantity input & "Add" button by default; show after Quick Add click */
+    .hidden-qty {
+      display: none;
+      margin-top: 5px;
+    }
+    .qty-message {
+      color: #c00;
+      font-size: 0.9em;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -214,39 +233,65 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
+        
+        // Quick Add approach: initially hide the quantity input & "Add" button
+        // We'll toggle them when "Quick Add" is clicked
         let inputField = meal.bulkOptions 
-          ? `<select id="meal-${index}"> 
+          ? `<select id="qtySelect-${index}" class="hidden-qty"> 
                ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} 
              </select>`
-          : `<input type="number" id="meal-${index}" min="1" placeholder="Qty">`;
+          : `<input type="number" id="qtyInput-${index}" min="1" class="hidden-qty" value="1">`;
         
         mealDiv.innerHTML = `
           <img src="${meal.image}" alt="${meal.name}">
           <h3>${meal.name}</h3>
           <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
           <div class="button-container">
-            <button onclick="addToCart(${index})">Add to Cart</button>
+            <button onclick="showQtySection(${index})">Quick Add</button>
             <button onclick="viewDetails(${index})">View Details</button>
           </div>
+          <p id="qtyMessage-${index}" class="qty-message" style="display:none;">Select quantity</p>
+          ${inputField}
+          <button id="addBtn-${index}" class="hidden-qty" onclick="addToCart(${index})">Add</button>
         `;
         container.appendChild(mealDiv);
       });
     }
     
+    // Show quantity input & "Add" button, plus a small message
+    function showQtySection(index) {
+      document.getElementById(`qtyMessage-${index}`).style.display = "block";
+      const selectEl = document.getElementById(`qtySelect-${index}`);
+      const inputEl = document.getElementById(`qtyInput-${index}`);
+      const addBtn = document.getElementById(`addBtn-${index}`);
+      
+      if (selectEl) selectEl.style.display = "inline-block";
+      if (inputEl) inputEl.style.display = "inline-block";
+      addBtn.style.display = "inline-block";
+    }
+    
     function addToCart(index) {
-      const quantityInput = document.getElementById(`meal-${index}`);
-      let quantity = parseInt(quantityInput.value);
-      if (isNaN(quantity) || quantity <= 0) return;
       const meal = meals[index];
+      let quantity = 1;
+      const selectEl = document.getElementById(`qtySelect-${index}`);
+      const inputEl = document.getElementById(`qtyInput-${index}`);
+      
+      if (selectEl) {
+        quantity = parseInt(selectEl.value);
+      } else if (inputEl) {
+        quantity = parseInt(inputEl.value);
+      }
+      if (isNaN(quantity) || quantity <= 0) quantity = 1;
+      
       const existingItem = cart.find(item => item.name === meal.name);
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
         cart.push({ name: meal.name, price: meal.price, quantity: quantity });
       }
-      quantityInput.value = "";
       updateCart();
       updateCartDropdown();
+      alert("Added to cart!");
     }
     
     function updateCart() {
@@ -257,7 +302,8 @@
       cart.forEach((item, i) => {
         total += item.price * item.quantity;
         const li = document.createElement("li");
-        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
+        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} 
+                        <button onclick="removeFromCart(${i})">Remove</button>`;
         cartList.appendChild(li);
       });
       totalPriceElement.innerText = total.toFixed(2);
@@ -289,11 +335,13 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
+      // Sum total items across all meal types
       let totalItems = 0;
       loadedCart.forEach(item => {
         totalItems += item.quantity;
       });
       document.getElementById("cartCount").innerText = totalItems;
+      
       const cartDropdownList = document.getElementById("cartDropdownList");
       cartDropdownList.innerHTML = "";
       const displayItems = loadedCart.slice(0, 4);
