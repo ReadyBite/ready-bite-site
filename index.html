@@ -71,6 +71,7 @@
       border: none;
       padding: 10px;
       cursor: pointer;
+      margin: 5px;
     }
   </style>
 </head>
@@ -109,7 +110,7 @@
   </div>
 
   <script>
-    // Sample meals array
+    // Sample meals array (for ordering purposes)
     const meals = [
       { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
       { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
@@ -122,18 +123,14 @@
       { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10], image: "smoked_chicken_adjusted_cropped_resized.png" }
     ];
 
-    // Cart array to store items
     let cart = [];
 
-    // Render the meals on the page
     function renderMeals() {
       const container = document.getElementById("mealContainer");
       container.innerHTML = "";
       meals.forEach((meal, index) => {
         let mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        
-        // If it's a bulk item, render a dropdown, else a quantity input
         let inputField = meal.bulkOptions 
           ? `<select id="meal-${index}"> 
                ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} 
@@ -146,12 +143,12 @@
           <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
           ${inputField}
           <button onclick="addToCart(${index})">Add to Cart</button>
+          <button onclick="viewDetails(${index})">View Details</button>
         `;
         container.appendChild(mealDiv);
       });
     }
 
-    // Add item to cart
     function addToCart(index) {
       const quantityInput = document.getElementById(`meal-${index}`);
       let quantity = parseInt(quantityInput.value);
@@ -167,7 +164,6 @@
       updateCart();
     }
 
-    // Update cart display
     function updateCart() {
       const cartList = document.getElementById("cartList");
       const totalPriceElement = document.getElementById("totalPrice");
@@ -182,19 +178,19 @@
       totalPriceElement.innerText = total.toFixed(2);
     }
 
-    // Go to the order page if the cart is not empty
     function goToOrderPage() {
       if (cart.length === 0) {
         alert("Your cart is empty. Add meals before submitting an order.");
         return;
       }
-      // Save cart data to localStorage
       localStorage.setItem("cartData", JSON.stringify(cart));
-      // Redirect to order page
       window.location.href = "order.html";
     }
 
-    // Dummy feedback function
+    function viewDetails(index) {
+      window.location.href = "product.html?id=" + index;
+    }
+
     function sendFeedback() {
       alert("Feedback submitted. Thank you!");
     }
