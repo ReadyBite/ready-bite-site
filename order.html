@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Ready Bite - Order</title>
   <style>
     body {
@@ -11,8 +11,52 @@
       margin: 0;
       padding: 20px;
     }
-    h1, h2 {
+    .nav-links {
       text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+    }
+    /* Cart Dropdown (global) */
+    .cart-dropdown {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .cart-dropdown:hover .cart-dropdown-content {
+      display: block;
+    }
+    .cart-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      min-width: 200px;
+      z-index: 1001;
+    }
+    .cart-dropdown-content ul {
+      list-style: none;
+      padding: 10px;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .cart-dropdown-content li {
+      margin-bottom: 5px;
+      font-size: 0.9em;
     }
     .order-container {
       max-width: 600px;
@@ -33,7 +77,7 @@
       display: block;
       margin-top: 10px;
     }
-    input[type="text"], 
+    input[type="text"],
     input[type="email"] {
       width: 100%;
       padding: 8px;
@@ -54,15 +98,6 @@
       width: 100%;
       font-size: 1em;
     }
-    .nav-links {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .nav-links a {
-      margin: 0 10px;
-      text-decoration: none;
-      color: #333;
-    }
   </style>
 </head>
 <body>
@@ -70,74 +105,102 @@
     <a href="index.html">Back to Main</a>
   </div>
   
+  <!-- Global Cart Dropdown -->
+  <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+    Cart (<span id="cartCount">0</span>)
+    <div class="cart-dropdown-content" id="cartDropdownContent">
+      <ul id="cartDropdownList"></ul>
+    </div>
+  </div>
+  
   <h1>Ready Bite</h1>
   <h2>Review Your Order & Checkout</h2>
-
+  
   <div class="order-container">
     <h3>Your Cart</h3>
     <div id="cartSummary" class="order-summary"></div>
     
-    <!-- The Checkout Form -->
+    <!-- Checkout Form -->
     <form id="checkoutForm">
       <label for="customerFirstName">First Name:</label>
       <input type="text" id="customerFirstName" required>
-
+      
       <label for="customerLastName">Last Name:</label>
       <input type="text" id="customerLastName" required>
-
+      
       <label for="customerPhone">Phone Number:</label>
       <input type="text" id="customerPhone" required>
-
+      
       <label for="customerEmail">Email:</label>
       <input type="email" id="customerEmail" required>
-
+      
       <label for="customerStreet">Street:</label>
       <input type="text" id="customerStreet" required>
-
+      
       <label for="customerCity">City:</label>
       <input type="text" id="customerCity" required>
-
+      
       <label for="customerState">State:</label>
       <input type="text" id="customerState" required>
-
+      
       <label for="customerZip">ZIP:</label>
       <input type="text" id="customerZip" required>
-
+      
       <label for="promoCode">Promotional Code (optional):</label>
       <input type="text" id="promoCode">
-
+      
       <h3>Payment</h3>
       <p>Venmo @Matt-Hanson-117 (Cash accepted if needed)</p>
-
+      
       <p class="privacy-notice">
         Your privacy is important. We do not share or sell your personal data.
       </p>
-
+      
       <button type="submit" class="submit-btn">Place Order</button>
     </form>
   </div>
-
+  
   <script>
     let cart = [];
-
-    // Load the cart from localStorage
+    
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
-      if (savedCart) {
-        cart = JSON.parse(savedCart);
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    
+    function saveCart(cart) {
+      localStorage.setItem("cartData", JSON.stringify(cart));
+    }
+    
+    function updateCartDropdown() {
+      const loadedCart = loadCart();
+      document.getElementById("cartCount").innerText = loadedCart.length;
+      const cartDropdownList = document.getElementById("cartDropdownList");
+      cartDropdownList.innerHTML = "";
+      const displayItems = loadedCart.slice(0, 4);
+      if (displayItems.length === 0) {
+        const li = document.createElement("li");
+        li.innerText = "Cart is empty";
+        cartDropdownList.appendChild(li);
+      } else {
+        displayItems.forEach(item => {
+          const li = document.createElement("li");
+          li.innerText = `${item.quantity}x ${item.name}`;
+          cartDropdownList.appendChild(li);
+        });
       }
     }
-
-    // Render cart summary
-    function renderCartSummary() {
+    
+    function updateCartSummary() {
+      const loadedCart = loadCart();
       const cartSummaryDiv = document.getElementById("cartSummary");
-      if (!cart || cart.length === 0) {
+      if (!loadedCart || loadedCart.length === 0) {
         cartSummaryDiv.textContent = "Your cart is empty.";
         return;
       }
       let summary = "";
       let total = 0;
-      cart.forEach(item => {
+      loadedCart.forEach(item => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         summary += `${item.quantity}x ${item.name} - $${itemTotal.toFixed(2)}\n`;
@@ -145,14 +208,15 @@
       summary += `\nTotal: $${total.toFixed(2)}`;
       cartSummaryDiv.textContent = summary;
     }
-
-    // Handle form submission
+    
+    function goToOrderPage() {
+      window.location.href = "order.html";
+    }
+    
     function setupFormSubmission() {
       const form = document.getElementById("checkoutForm");
       form.addEventListener("submit", function(e) {
         e.preventDefault();
-
-        // Collect user input
         const customerFirstName = document.getElementById("customerFirstName").value.trim();
         const customerLastName = document.getElementById("customerLastName").value.trim();
         const customerPhone = document.getElementById("customerPhone").value.trim();
@@ -162,21 +226,22 @@
         const customerState = document.getElementById("customerState").value.trim();
         const customerZip = document.getElementById("customerZip").value.trim();
         const promoCode = document.getElementById("promoCode").value.trim();
-
+        
         if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail ||
             !customerStreet || !customerCity || !customerState || !customerZip) {
           alert("Please fill out all required fields.");
           return;
         }
-
+        
         let orderDetails = "";
         let total = 0;
-        cart.forEach(item => {
+        const loadedCart = loadCart();
+        loadedCart.forEach(item => {
           const itemTotal = item.price * item.quantity;
           total += itemTotal;
           orderDetails += `${item.quantity}x ${item.name} - $${itemTotal.toFixed(2)}\n`;
         });
-
+        
         const message = 
           `Name: ${customerFirstName} ${customerLastName}\n` +
           `Phone: ${customerPhone}\n` +
@@ -186,7 +251,7 @@
           `Order List:\n${orderDetails}\n\n` +
           `Total: $${total.toFixed(2)}\n\n` +
           `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
-
+        
         fetch('https://formspree.io/f/xwplpgbp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -198,7 +263,6 @@
           })
         })
         .then(response => {
-          console.log('Response status:', response.status);
           if (!response.ok) {
             return response.text().then(text => { throw new Error(text); });
           }
@@ -206,21 +270,20 @@
         })
         .then(data => {
           alert("Your order has been received! A confirmation email has been sent.");
-          cart = [];
           localStorage.removeItem("cartData");
-          // Redirect the customer back to the main page
-          window.location.href = "main.html";
+          window.location.href = "index.html";
         })
         .catch(error => {
-          console.error('Fetch error:', error);
           alert("Error sending order. Please try again. " + error);
         });
       });
     }
-
-    loadCart();
-    renderCartSummary();
-    setupFormSubmission();
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      updateCartDropdown();
+      updateCartSummary();
+      setupFormSubmission();
+    });
   </script>
 </body>
 </html>
