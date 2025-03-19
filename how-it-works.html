@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ready Bite - How It Works</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 50px;
+      background-color: #eeeeee;
+    }
+    .company-name {
+      font-size: 2em;
+      font-weight: bold;
+    }
+    .company-name a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    nav {
+      margin-right: 20px;
+    }
+    nav a {
+      margin-right: 10px;
+      text-decoration: none;
+      color: #333;
+      font-size: 1.2em;
+    }
+    /* Timeline Styles */
+    .timeline {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 30px;
+      top: 20px;
+      bottom: 20px;
+      width: 2px;
+      background-color: #4CAF50;
+    }
+    .step {
+      position: relative;
+      padding-left: 60px;
+      margin-bottom: 30px;
+    }
+    .step:last-child {
+      margin-bottom: 0;
+    }
+    .step-icon {
+      position: absolute;
+      left: 10px;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      background-color: #4CAF50;
+      border-radius: 50%;
+      text-align: center;
+      color: #fff;
+      line-height: 40px;
+      font-weight: bold;
+      font-size: 1em;
+    }
+    .step h2 {
+      margin: 0 0 5px 0;
+      font-size: 1.4em;
+    }
+    .step p {
+      margin: 0;
+      line-height: 1.5;
+    }
+    /* Back Button */
+    .back-button {
+      text-align: center;
+      margin: 20px;
+    }
+    .back-button a {
+      text-decoration: none;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.1em;
+    }
+    @media (max-width: 768px) {
+      .timeline {
+        margin: 20px 10px;
+        padding: 20px 10px;
+      }
+      .step {
+        padding-left: 50px;
+      }
+      .step-icon {
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        left: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="company-name"><a href="index.html">Ready Bite</a></div>
+    <div class="header-right">
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="how-it-works.html">How It Works</a>
+      </nav>
+    </div>
+  </header>
+  
+  <main>
+    <h1 style="text-align: center; margin-top: 20px;">How It Works</h1>
+    <div class="timeline">
+      <div class="step">
+        <div class="step-icon">1</div>
+        <h2>Weekly Menu Posted</h2>
+        <p>Each week, our fresh meals are posted on our website for you to browse.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">2</div>
+        <h2>Order by Sunday</h2>
+        <p>Place your order through our website by Sunday each week. This allows us time to plan, prepare, and cook your meals.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">3</div>
+        <h2>Delivery the Following Sunday</h2>
+        <p>Your order is delivered the following Sunday. The gap helps us ensure quality and allows us to plan all meals perfectly.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">4</div>
+        <h2>Free Delivery</h2>
+        <p>We offer free delivery as we are a new company dedicated to providing you the best value.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">5</div>
+        <h2>Payment Options</h2>
+        <p>Currently, we accept cash and Venmo only. We plan to introduce more professional payment methods later.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">6</div>
+        <h2>Order Confirmation</h2>
+        <p>Once you place your order, you receive an email summarizing your order and total. We also get notified.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">7</div>
+        <h2>Payment Confirmation</h2>
+        <p>After payment is received, you’ll receive another email confirming payment and locking in your order.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">8</div>
+        <h2>Cancellation Policy</h2>
+        <p>If you need to cancel, a 3-day notice is required for a full refund. A 2-day cancellation gets 50% back, and cancellations after that are non-refundable.</p>
+      </div>
+    </div>
+  </main>
+  
+  <div class="back-button">
+    <a href="index.html">Back to Main</a>
+  </div>
+</body>
+</html>
