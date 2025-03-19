@@ -135,7 +135,6 @@
         cartSummaryDiv.textContent = "Your cart is empty.";
         return;
       }
-
       let summary = "";
       let total = 0;
       cart.forEach(item => {
@@ -164,14 +163,12 @@
         const customerZip = document.getElementById("customerZip").value.trim();
         const promoCode = document.getElementById("promoCode").value.trim();
 
-        // Validate required fields
         if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail ||
             !customerStreet || !customerCity || !customerState || !customerZip) {
           alert("Please fill out all required fields.");
           return;
         }
 
-        // Build the cart details
         let orderDetails = "";
         let total = 0;
         cart.forEach(item => {
@@ -190,13 +187,12 @@
           `Total: $${total.toFixed(2)}\n\n` +
           `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
 
-        // Updated fetch with logging to diagnose 404 errors
         fetch('https://formspree.io/f/xwplpgbp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email: 'readybitemeals@gmail.com',
-            replyto: customerEmail, // so the customer gets a confirmation
+            replyto: customerEmail,
             subject: 'Your Order Confirmation',
             message: message
           })
@@ -210,10 +206,9 @@
         })
         .then(data => {
           alert("Your order has been received! A confirmation email has been sent.");
-          // Clear cart and localStorage
           cart = [];
           localStorage.removeItem("cartData");
-          // Redirect back to main page (or show a thank you page)
+          // Redirect the customer back to the main page
           window.location.href = "main.html";
         })
         .catch(error => {
@@ -223,7 +218,6 @@
       });
     }
 
-    // Initialize
     loadCart();
     renderCartSummary();
     setupFormSubmission();
