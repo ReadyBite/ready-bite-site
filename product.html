@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Ready Bite - Product Details</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Include Chart.js if needed -->
+  <!-- Include Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Common Styles */
@@ -23,6 +23,7 @@
       background-color: #eeeeee;
       width: 100%;
       box-sizing: border-box;
+      position: relative;
     }
     .company-name {
       font-size: 2em;
@@ -107,7 +108,7 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
-    /* Product Content */
+    /* Product Container */
     .product-container {
       display: flex;
       flex-wrap: wrap;
@@ -139,25 +140,54 @@
     .product-info p {
       line-height: 1.5;
     }
-    /* Add to Cart Section */
-    .add-cart-section {
-      text-align: center;
+    /* Nutrition Charts Grid */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 400px;
       margin: 20px auto;
     }
-    .add-cart-section input[type="number"] {
-      width: 60px;
-      padding: 5px;
-      margin-right: 10px;
+    .chart-item {
+      text-align: center;
     }
-    .add-cart-section button {
+    .chart-item canvas {
+      width: 80px !important;
+      height: 80px !important;
+    }
+    .chart-item p {
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    /* Nutrition Table */
+    .nutrition-table {
+      max-width: 400px;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    .nutrition-table th, .nutrition-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .nutrition-table th {
       background-color: #4CAF50;
       color: white;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 5px;
     }
-    /* Responsive adjustments */
+    /* Back Button */
+    .back-button {
+      text-align: center;
+      margin: 20px;
+    }
+    .back-button a {
+      text-decoration: none;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.1em;
+    }
+    /* Responsive adjustments for header */
     @media (max-width: 768px) {
       .desktop-nav { display: none; }
       .menu-button { display: block; }
@@ -190,52 +220,64 @@
     <!-- Product details will be inserted here -->
   </div>
   
-  <!-- Add to Cart Section on Product Page -->
-  <div class="add-cart-section" id="addCartSection">
-    <label for="productQuantity">Quantity:</label>
-    <input type="number" id="productQuantity" min="1" value="1">
-    <button onclick="addProductToCart()">Add to Cart</button>
+  <!-- Nutrition Charts Section -->
+  <div class="chart-grid" id="chartGrid">
+    <div class="chart-item">
+      <canvas id="caloriesChart"></canvas>
+      <p>Calories</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="fatChart"></canvas>
+      <p>Fat</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="proteinChart"></canvas>
+      <p>Protein</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="carbsChart"></canvas>
+      <p>Carbs</p>
+    </div>
   </div>
   
-  <div class="back-button" style="text-align:center; margin:20px;">
-    <a href="index.html" style="text-decoration:none; background-color:#4CAF50; color:white; padding:10px 20px; border-radius:5px;">Back to Main</a>
+  <!-- Nutrition Table -->
+  <table class="nutrition-table" id="nutritionTable">
+    <tr>
+      <th>Nutrient</th>
+      <th>Amount</th>
+      <th>% Daily Value</th>
+    </tr>
+    <tr>
+      <td>Calories</td>
+      <td id="caloriesValue"></td>
+      <td id="caloriesPercent"></td>
+    </tr>
+    <tr>
+      <td>Fat</td>
+      <td id="fatValue"></td>
+      <td id="fatPercent"></td>
+    </tr>
+    <tr>
+      <td>Protein</td>
+      <td id="proteinValue"></td>
+      <td id="proteinPercent"></td>
+    </tr>
+    <tr>
+      <td>Carbs</td>
+      <td id="carbsValue"></td>
+      <td id="carbsPercent"></td>
+    </tr>
+  </table>
+  
+  <div class="back-button">
+    <a href="index.html">Back to Main</a>
   </div>
   
   <script>
-    // Common Header and Cart Functions (shared with index.html)
+    // Toggle mobile menu
     function toggleMobileMenu() {
       const menu = document.getElementById("mobileMenu");
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
-    }
-    function goToOrderPage() {
-      window.location.href = "order.html";
-    }
-    function loadCart() {
-      const savedCart = localStorage.getItem("cartData");
-      return savedCart ? JSON.parse(savedCart) : [];
-    }
-    function saveCart(cart) {
-      localStorage.setItem("cartData", JSON.stringify(cart));
-    }
-    function updateCartDropdown() {
-      const loadedCart = loadCart();
-      let totalItems = 0;
-      loadedCart.forEach(item => { totalItems += item.quantity; });
-      document.getElementById("cartCount").innerText = totalItems;
-      const cartDropdownList = document.getElementById("cartDropdownList");
-      cartDropdownList.innerHTML = "";
-      const displayItems = loadedCart.slice(0, 4);
-      if (displayItems.length === 0) {
-        const li = document.createElement("li");
-        li.innerText = "Cart is empty";
-        cartDropdownList.appendChild(li);
-      } else {
-        displayItems.forEach(item => {
-          const li = document.createElement("li");
-          li.innerText = `${item.quantity}x ${item.name}`;
-          cartDropdownList.appendChild(li);
-        });
-      }
     }
     
     // Sample meals array (must match the one on main page)
@@ -315,31 +357,102 @@
       }
     ];
     
-    // For product page, assume we get an id via URL query
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    let cart = [];
     
-    const productContent = document.getElementById("productContent");
-    if (id === null || isNaN(id) || id < 0 || id >= meals.length) {
-      productContent.innerHTML = "<p>Product not found.</p>";
-    } else {
-      const meal = meals[id];
-      productContent.innerHTML = `
-        <div class="product-image">
-          <img src="${meal.image}" alt="${meal.name}">
-        </div>
-        <div class="product-info">
-          <h2>${meal.name}</h2>
-          <p>${meal.description}</p>
-          <h3>Ingredients</h3>
-          <p>${meal.ingredients}</p>
-          <h3>Nutrition Info</h3>
-          <p>Calories: ${meal.macros.calories} kcal, Fat: ${meal.macros.fat}g, Protein: ${meal.macros.protein}g, Carbs: ${meal.macros.carbs}g</p>
-        </div>
-      `;
+    function renderMeals() {
+      const container = document.getElementById("mealContainer");
+      container.innerHTML = "";
+      meals.forEach((meal, index) => {
+        const mealDiv = document.createElement("div");
+        mealDiv.className = "meal";
+        // Entire card clickable except quick add controls
+        mealDiv.onclick = function(e) {
+          if (e.target.tagName.toLowerCase() !== 'button' &&
+              e.target.tagName.toLowerCase() !== 'input' &&
+              e.target.tagName.toLowerCase() !== 'select') {
+            viewDetails(index);
+          }
+        };
+        
+        mealDiv.innerHTML = `
+          <div class="nutrition-banner">
+            Cal: 500 F:20g C:40g P:40g
+          </div>
+          <div class="image-container">
+            <img src="${meal.image}" alt="${meal.name}">
+            <div class="overlay">
+              <h3>${meal.name}</h3>
+              <p>${meal.macros.calories} Cal, ${meal.macros.fat}g Fat, ${meal.macros.carbs}g Carbs, ${meal.macros.protein}g Protein</p>
+              <p>${meal.shortDesc}</p>
+            </div>
+          </div>
+          <div class="meal-info">
+            <h3>${meal.name}</h3>
+            <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
+          </div>
+          <div class="button-container">
+            <button onclick="showQtySection(event, ${index})">Quick Add</button>
+            <button onclick="viewDetails(${index})">View Details</button>
+          </div>
+          <div class="quick-add-controls" id="quickAdd-${index}">
+            <input type="number" id="quantity-${index}" min="1" value="1">
+            <button onclick="quickAdd(${index}, event)">Add</button>
+          </div>
+        `;
+        container.appendChild(mealDiv);
+      });
+    }
+    
+    // Show quick add controls and prevent propagation
+    function showQtySection(e, index) {
+      e.stopPropagation();
+      const control = document.getElementById(`quickAdd-${index}`);
+      control.style.display = "block";
+    }
+    
+    // Quick Add: get quantity, add item to cart, then hide controls
+    function quickAdd(index, e) {
+      e.stopPropagation();
+      const quantityInput = document.getElementById(`quantity-${index}`);
+      let quantity = parseInt(quantityInput.value);
+      if (isNaN(quantity) || quantity <= 0) quantity = 1;
+      const meal = meals[index];
+      const existingItem = cart.find(item => item.name === meal.name);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+      }
+      updateCart();
+      updateCartDropdown();
+      alert("Added to cart!");
+      document.getElementById(`quickAdd-${index}`).style.display = "none";
     }
     
     // Global Cart Functions
+    function updateCart() {
+      const cartList = document.getElementById("cartList");
+      const totalPriceElement = document.getElementById("totalPrice");
+      cartList.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, i) => {
+        total += item.price * item.quantity;
+        const li = document.createElement("li");
+        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
+        cartList.appendChild(li);
+      });
+      totalPriceElement.innerText = total.toFixed(2);
+      localStorage.setItem("cartData", JSON.stringify(cart));
+    }
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+      updateCartDropdown();
+    }
+    function loadCart() {
+      const savedCart = localStorage.getItem("cartData");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
     function updateCartDropdown() {
       const loadedCart = loadCart();
       let totalItems = 0;
@@ -360,45 +473,11 @@
         });
       }
     }
-    
-    function updateCart() {
-      const cartList = document.getElementById("cartList");
-      const totalPriceElement = document.getElementById("totalPrice");
-      cartList.innerHTML = "";
-      let total = 0;
-      cart.forEach((item, i) => {
-        total += item.price * item.quantity;
-        const li = document.createElement("li");
-        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
-        cartList.appendChild(li);
-      });
-      totalPriceElement.innerText = total.toFixed(2);
-      saveCart(cart);
+    function viewDetails(index) {
+      window.location.href = "product.html?id=" + index;
     }
-    
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      updateCart();
-      updateCartDropdown();
-    }
-    
-    function addProductToCart() {
-      // On product page, use quantity field from add-cart-section
-      const quantityInput = document.getElementById("productQuantity");
-      let quantity = parseInt(quantityInput.value);
-      if (isNaN(quantity) || quantity <= 0) quantity = 1;
-      // Use the meal from the current product page (if id is valid)
-      if (id === null || isNaN(id) || id < 0 || id >= meals.length) return;
-      const meal = meals[id];
-      const existingItem = cart.find(item => item.name === meal.name);
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
-      }
-      updateCart();
-      updateCartDropdown();
-      alert("Added to cart!");
+    function goToOrderPage() {
+      window.location.href = "order.html";
     }
     
     document.addEventListener("DOMContentLoaded", function() {
@@ -406,6 +485,8 @@
       if (savedCart) {
         cart = JSON.parse(savedCart);
       }
+      renderMeals();
+      updateCart();
       updateCartDropdown();
     });
   </script>
