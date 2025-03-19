@@ -22,6 +22,10 @@
       font-size: 2em;
       font-weight: bold;
     }
+    .company-name a {
+      text-decoration: none;
+      color: inherit;
+    }
     .header-right {
       display: flex;
       align-items: center;
@@ -87,6 +91,12 @@
       border: 1px solid #ccc;
       margin-bottom: 20px;
     }
+    .error-message {
+      color: #c00;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
     label {
       display: block;
       margin-top: 10px;
@@ -112,17 +122,34 @@
       width: 100%;
       font-size: 1em;
     }
-    .error-message {
-      color: #c00;
-      font-weight: bold;
-      margin-top: 10px;
+    .cart-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .cart-section li {
       margin-bottom: 10px;
+      font-size: 1em;
+    }
+    .cart-section li button {
+      margin-left: 10px;
+      background-color: #c00;
+      border: none;
+      color: white;
+      padding: 2px 6px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    /* Payment info text */
+    #paymentInfo {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="company-name">Ready Bite</div>
+    <div class="company-name"><a href="index.html">Ready Bite</a></div>
     <div class="header-right">
       <nav>
         <a href="index.html">Home</a>
@@ -143,7 +170,7 @@
   
   <div class="order-container">
     <h3>Your Cart</h3>
-    <!-- If the user fails to fill out all required fields, show an error message here -->
+    <!-- Error message for required fields -->
     <div id="errorMsg" class="error-message" style="display:none;">Please fill out all required fields</div>
     <div id="cartSummary" class="order-summary"></div>
     
@@ -175,12 +202,14 @@
       
       <label for="promoCode">Promotional Code (optional):</label>
       <input type="text" id="promoCode">
-
-      <!-- Payment Checkbox/Radio -->
+      
+      <!-- Payment Method -->
       <h3>Payment</h3>
       <p>Select Payment Method:</p>
       <label><input type="radio" name="paymentMethod" value="venmo" checked> Venmo</label>
       <label><input type="radio" name="paymentMethod" value="cash"> Cash</label>
+      <!-- Payment Info Message -->
+      <div id="paymentInfo">Please Venmo @Matt-Hanson-117</div>
       
       <p class="privacy-notice">
         Your privacy is important. We do not share or sell your personal data.
@@ -191,7 +220,7 @@
   </div>
   
   <script>
-    // Cart management
+    // CART FUNCTIONS
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
@@ -246,12 +275,21 @@
       window.location.href = "order.html";
     }
     
+    function removeFromCart(index) {
+      let loadedCart = loadCart();
+      loadedCart.splice(index, 1);
+      saveCart(loadedCart);
+      updateCartSummary();
+      updateCartDropdown();
+    }
+    
+    // Checkout Form Submission & Field Validation
     function setupFormSubmission() {
       const form = document.getElementById("checkoutForm");
       form.addEventListener("submit", function(e) {
         e.preventDefault();
         
-        // If any required field is empty, show the error message
+        // Check required fields
         const requiredFields = [
           "customerFirstName",
           "customerLastName",
@@ -265,9 +303,7 @@
         let allFilled = true;
         requiredFields.forEach(id => {
           const val = document.getElementById(id).value.trim();
-          if (!val) {
-            allFilled = false;
-          }
+          if (!val) { allFilled = false; }
         });
         if (!allFilled) {
           document.getElementById("errorMsg").style.display = "block";
@@ -296,3 +332,68 @@
           const itemTotal = item.price * item.quantity;
           total += itemTotal;
           orderDetails += `${item.quantity}x ${item.name} - $${itemTotal.toFixed(2)}\n`;
+        });
+        
+        const message = 
+          `Name: ${customerFirstName} ${customerLastName}\n` +
+          `Phone: ${customerPhone}\n` +
+          `Email: ${customerEmail}\n` +
+          `Address: ${customerStreet}, ${customerCity}, ${customerState} ${customerZip}\n` +
+          `Payment Method: ${paymentMethod}\n` +
+          `Promo Code: ${promoCode || "N/A"}\n\n` +
+          `Order List:\n${orderDetails}\n\n` +
+          `Total: $${total.toFixed(2)}\n\n` +
+          `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
+        
+        // Send order via Formspree (enable autoresponder on your Formspree account if desired)
+        fetch('https://formspree.io/f/xwplpgbp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'readybitemeals@gmail.com',
+            replyto: customerEmail,
+            subject: 'Your Order Confirmation',
+            message: message
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+          }
+          return response.json();
+        })
+        .then(data => {
+          alert("Your order has been received! A confirmation email has been sent (if autoresponder is enabled).");
+          localStorage.removeItem("cartData");
+          window.location.href = "index.html";
+        })
+        .catch(error => {
+          alert("Error sending order. Please try again. " + error);
+        });
+      });
+    }
+    
+    // Payment method event listener to update payment info text
+    function setupPaymentMethodListener() {
+      const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+      const paymentInfoDiv = document.getElementById("paymentInfo");
+      paymentRadios.forEach(radio => {
+        radio.addEventListener("change", function() {
+          if (this.value === "venmo") {
+            paymentInfoDiv.innerText = "Please Venmo @Matt-Hanson-117";
+          } else if (this.value === "cash") {
+            paymentInfoDiv.innerText = "Cash is due when delivered";
+          }
+        });
+      });
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      updateCartDropdown();
+      updateCartSummary();
+      setupFormSubmission();
+      setupPaymentMethodListener();
+    });
+  </script>
+</body>
+</html>
