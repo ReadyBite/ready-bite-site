@@ -14,13 +14,24 @@
     }
     header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       padding: 10px 50px;
       background-color: #eee;
     }
-    header nav a {
+    .company-name {
+      font-size: 2em;
+      font-weight: bold;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    nav {
       margin-right: 20px;
+    }
+    nav a {
+      margin-right: 10px;
       text-decoration: none;
       color: #333;
       font-size: 1.2em;
@@ -112,6 +123,23 @@
       border-radius: 5px;
       text-align: left;
     }
+    .cart-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .cart-section li {
+      margin-bottom: 10px;
+      font-size: 1em;
+    }
+    .cart-section li button {
+      margin-left: 10px;
+      background-color: #c00;
+      border: none;
+      color: white;
+      padding: 2px 6px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
     .feedback-section {
       max-width: 800px;
       margin: 20px auto;
@@ -123,16 +151,18 @@
 </head>
 <body>
   <header>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="about.html">About Us</a>
-      <a href="how-it-works.html">How It Works</a>
-    </nav>
-    <!-- Global Cart Dropdown in Header -->
-    <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
-      Cart (<span id="cartCount">0</span>)
-      <div class="cart-dropdown-content" id="cartDropdownContent">
-        <ul id="cartDropdownList"></ul>
+    <div class="company-name">Ready Bite</div>
+    <div class="header-right">
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="how-it-works.html">How It Works</a>
+      </nav>
+      <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+        Cart (<span id="cartCount">0</span>)
+        <div class="cart-dropdown-content" id="cartDropdownContent">
+          <ul id="cartDropdownList"></ul>
+        </div>
       </div>
     </div>
   </header>
@@ -224,14 +254,20 @@
       const totalPriceElement = document.getElementById("totalPrice");
       cartList.innerHTML = "";
       let total = 0;
-      cart.forEach(item => {
+      cart.forEach((item, i) => {
         total += item.price * item.quantity;
         const li = document.createElement("li");
-        li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
         cartList.appendChild(li);
       });
       totalPriceElement.innerText = total.toFixed(2);
       localStorage.setItem("cartData", JSON.stringify(cart));
+    }
+    
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+      updateCartDropdown();
     }
     
     function viewDetails(index) {
@@ -253,7 +289,6 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
-      // Calculate total number of items (sum of quantities)
       let totalItems = 0;
       loadedCart.forEach(item => {
         totalItems += item.quantity;
