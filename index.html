@@ -19,27 +19,20 @@
       padding: 10px 50px;
       background-color: #eee;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2em;
-    }
     header nav a {
-      margin: 0 10px;
+      margin-right: 20px;
       text-decoration: none;
       color: #333;
       font-size: 1.2em;
     }
-    /* Global Cart Dropdown (appears on every page) */
+    /* Global Cart Dropdown */
     .cart-dropdown {
-      position: fixed;
-      top: 10px;
-      right: 10px;
       background-color: #333;
       color: white;
       padding: 10px;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000;
+      position: relative;
     }
     .cart-dropdown:hover .cart-dropdown-content {
       display: block;
@@ -130,21 +123,19 @@
 </head>
 <body>
   <header>
-    <h1>Ready Bite</h1>
     <nav>
       <a href="index.html">Home</a>
       <a href="about.html">About Us</a>
       <a href="how-it-works.html">How It Works</a>
     </nav>
-  </header>
-  
-  <!-- Global Cart Dropdown -->
-  <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
-    Cart (<span id="cartCount">0</span>)
-    <div class="cart-dropdown-content" id="cartDropdownContent">
-      <ul id="cartDropdownList"></ul>
+    <!-- Global Cart Dropdown in Header -->
+    <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+      Cart (<span id="cartCount">0</span>)
+      <div class="cart-dropdown-content" id="cartDropdownContent">
+        <ul id="cartDropdownList"></ul>
+      </div>
     </div>
-  </div>
+  </header>
   
   <div class="meal-container" id="mealContainer"></div>
   
@@ -255,7 +246,6 @@
       alert("Feedback submitted. Thank you!");
     }
     
-    // Cart Dropdown functions
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
@@ -263,7 +253,12 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
-      document.getElementById("cartCount").innerText = loadedCart.length;
+      // Calculate total number of items (sum of quantities)
+      let totalItems = 0;
+      loadedCart.forEach(item => {
+        totalItems += item.quantity;
+      });
+      document.getElementById("cartCount").innerText = totalItems;
       const cartDropdownList = document.getElementById("cartDropdownList");
       cartDropdownList.innerHTML = "";
       const displayItems = loadedCart.slice(0, 4);
@@ -281,7 +276,6 @@
     }
     
     document.addEventListener("DOMContentLoaded", function() {
-      // Load cart if it exists
       const savedCart = localStorage.getItem("cartData");
       if (savedCart) {
         cart = JSON.parse(savedCart);
