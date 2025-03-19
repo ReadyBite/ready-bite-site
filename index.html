@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready Bite</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f5f5f5; color: #333; }
+        .meal-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+        .meal { border: 1px solid #ccc; padding: 10px; width: 200px; background-color: #fff; }
+        .meal img { width: 150px; height: 150px; object-fit: cover; border-radius: 10px; }
+        .cart { margin-top: 20px; background-color: #333; color: white; padding: 15px; border-radius: 5px; }
+        .hidden { display: none; }
+        .feedback-section { margin-top: 50px; padding: 20px; background-color: #e8e8e8; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5); }
+        .modal input { width: 100%; padding: 8px; margin-top: 5px; }
+        .modal button { margin-top: 10px; background-color: #28a745; color: white; padding: 10px; border: none; cursor: pointer; }
+        button { background-color: #555; color: white; border: none; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Ready Bite</h1>
+    <nav>
+        <a href="index.html">Home</a> | <a href="about.html">About Us</a> | <a href="how-it-works.html">How It Works</a>
+    </nav>
+    <div class="meal-container" id="mealContainer"></div>
+    <div class="cart">
+        <h2>Cart</h2>
+        <ul id="cartList"></ul>
+        <p>Total: $<span id="totalPrice">0.00</span></p>
+        <button onclick="openOrderModal()">Submit Order</button>
+    </div>
+
+    <div class="feedback-section">
+        <h2>Feedback</h2>
+        <p>We value your feedback! Please let us know how we can improve.</p>
+        <label for="feedbackMessage">General Feedback:</label>
+        <textarea id="feedbackMessage" rows="4" style="width: 100%;" placeholder="Enter your feedback here..."></textarea>
+        <label for="rating">Rate your experience (1-5):</label>
+        <select id="rating">
+            <option value="1">1 - Poor</option>
+            <option value="2">2 - Fair</option>
+            <option value="3">3 - Good</option>
+            <option value="4">4 - Very Good</option>
+            <option value="5" selected>5 - Excellent</option>
+        </select>
+        <button onclick="sendFeedback()">Submit Feedback</button>
+    </div>
+
+    <script>
+        const meals = [
+            { name: "Beef Spaghetti", price: 10, image: "spaghetti.png" },
+            { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken.png" },
+            { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef.png" },
+            { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas.png" },
+            { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas.png" },
+            { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo.png" },
+            { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken.png" },
+            { name: "Chicken Fajita", price: 10, image: "chicken_fajita.png" },
+            { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10] }
+        ];
+
+        let cart = [];
+
+        function renderMeals() {
+            const container = document.getElementById("mealContainer");
+            container.innerHTML = "";
+            meals.forEach((meal, index) => {
+                let mealDiv = document.createElement("div");
+                mealDiv.className = "meal";
+                let inputField = meal.bulkOptions 
+                    ? `<select id="meal-${index}"> ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} </select>`
+                    : `<input type="number" id="meal-${index}" min="1" placeholder="Qty">`;
+                
+                mealDiv.innerHTML = `
+                    <img src="${meal.image}" alt="${meal.name}">
+                    <h3>${meal.name}</h3>
+                    <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
+                    ${inputField}
+                    <button onclick="addToCart(${index})">Add to Cart</button>
+                `;
+                container.appendChild(mealDiv);
+            });
+        }
+
+        function addToCart(index) {
+            const quantityInput = document.getElementById(`meal-${index}`);
+            let quantity = parseInt(quantityInput.value);
+            if (isNaN(quantity) || quantity <= 0) return;
+
+            let meal = meals[index];
+            let existingItem = cart.find(item => item.name === meal.name);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+            }
+            quantityInput.value = "";
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartList = document.getElementById("cartList");
+            const totalPriceElement = document.getElementById("totalPrice");
+            cartList.innerHTML = "";
+            let total = 0;
+
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                let li = document.createElement("li");
+                li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+                cartList.appendChild(li);
+            });
+            totalPriceElement.innerText = total.toFixed(2);
+        }
+
+        renderMeals();
+    </script>
+</body>
+</html>
