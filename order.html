@@ -16,7 +16,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 50px;
-      background-color: #eee;
+      background-color: #eeeeee;
     }
     .company-name {
       font-size: 2em;
@@ -40,7 +40,7 @@
       font-size: 1.2em;
     }
     .cart-dropdown {
-      background-color: #333;
+      background-color: #4CAF50;
       color: white;
       padding: 10px;
       border-radius: 5px;
@@ -114,7 +114,7 @@
     }
     .submit-btn {
       margin-top: 20px;
-      background-color: #28a745;
+      background-color: #4CAF50;
       color: white;
       padding: 10px;
       border: none;
@@ -132,7 +132,7 @@
     }
     .cart-section li button {
       margin-left: 10px;
-      background-color: #c00;
+      background-color: #F44336;
       border: none;
       color: white;
       padding: 2px 6px;
@@ -345,7 +345,7 @@
           `Total: $${total.toFixed(2)}\n\n` +
           `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
         
-        // Send order via Formspree (enable autoresponder on your Formspree account if desired)
+        // Send order via Formspree (set up autoresponder in Formspree if desired)
         fetch('https://formspree.io/f/xwplpgbp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -373,7 +373,7 @@
       });
     }
     
-    // Payment method event listener to update payment info text
+    // Payment method listener to update payment info text
     function setupPaymentMethodListener() {
       const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
       const paymentInfoDiv = document.getElementById("paymentInfo");
