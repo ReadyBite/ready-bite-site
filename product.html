@@ -7,7 +7,7 @@
   <!-- Include Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Common Styles */
+    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #f5f5f5;
@@ -108,7 +108,12 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
-    /* Product Container */
+    /* Responsive header */
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+      .menu-button { display: block; }
+    }
+    /* Product Details Container */
     .product-container {
       display: flex;
       flex-wrap: wrap;
@@ -122,7 +127,6 @@
       flex: 1;
       min-width: 250px;
       max-width: 300px;
-      margin-right: 20px;
     }
     .product-image img {
       width: 100%;
@@ -139,6 +143,25 @@
     }
     .product-info p {
       line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    /* Quick Add Section */
+    .quick-add-section {
+      text-align: center;
+      margin: 20px;
+    }
+    .quick-add-section input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+    .quick-add-section button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
     }
     /* Nutrition Charts Grid */
     .chart-grid {
@@ -187,11 +210,6 @@
       border-radius: 5px;
       font-size: 1.1em;
     }
-    /* Responsive adjustments for header */
-    @media (max-width: 768px) {
-      .desktop-nav { display: none; }
-      .menu-button { display: block; }
-    }
   </style>
 </head>
 <body>
@@ -216,8 +234,21 @@
     </div>
   </header>
   
-  <div class="product-container" id="productContent">
-    <!-- Product details will be inserted here -->
+  <!-- Product Details Section -->
+  <div class="product-container" id="productContainer">
+    <div class="product-image" id="productImage">
+      <!-- Image will be inserted here -->
+    </div>
+    <div class="product-info" id="productInfo">
+      <!-- Product info (title, description, ingredients) will be inserted here -->
+    </div>
+  </div>
+  
+  <!-- Quick Add Section -->
+  <div class="quick-add-section" id="quickAddSection">
+    <label for="productQuantity">Quantity:</label>
+    <input type="number" id="productQuantity" min="1" value="1">
+    <button onclick="addProductToCart()">Add to Cart</button>
   </div>
   
   <!-- Nutrition Charts Section -->
@@ -280,7 +311,44 @@
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
-    // Sample meals array (must match the one on main page)
+    // Global Cart Functions
+    function loadCart() {
+      const savedCart = localStorage.getItem("cartData");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    function saveCart(cart) {
+      localStorage.setItem("cartData", JSON.stringify(cart));
+    }
+    function updateCartDropdown() {
+      const loadedCart = loadCart();
+      let totalItems = 0;
+      loadedCart.forEach(item => { totalItems += item.quantity; });
+      document.getElementById("cartCount").innerText = totalItems;
+      const cartDropdownList = document.getElementById("cartDropdownList");
+      cartDropdownList.innerHTML = "";
+      const displayItems = loadedCart.slice(0, 4);
+      if (displayItems.length === 0) {
+        const li = document.createElement("li");
+        li.innerText = "Cart is empty";
+        cartDropdownList.appendChild(li);
+      } else {
+        displayItems.forEach(item => {
+          const li = document.createElement("li");
+          li.innerText = `${item.quantity}x ${item.name}`;
+          cartDropdownList.appendChild(li);
+        });
+      }
+    }
+    function updateCart() {
+      // This product page might not have a full cart view; update local storage and dropdown
+      updateCartDropdown();
+      const cartList = document.getElementById("cartList");
+      if (cartList) {
+        cartList.innerHTML = "";
+      }
+    }
+    
+    // Sample meals array (must match main page)
     const meals = [
       {
         name: "Beef Spaghetti",
@@ -359,64 +427,114 @@
     
     let cart = [];
     
-    function renderMeals() {
-      const container = document.getElementById("mealContainer");
-      container.innerHTML = "";
-      meals.forEach((meal, index) => {
-        const mealDiv = document.createElement("div");
-        mealDiv.className = "meal";
-        // Entire card clickable except quick add controls
-        mealDiv.onclick = function(e) {
-          if (e.target.tagName.toLowerCase() !== 'button' &&
-              e.target.tagName.toLowerCase() !== 'input' &&
-              e.target.tagName.toLowerCase() !== 'select') {
-            viewDetails(index);
+    // Load product data based on URL parameter
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    
+    const productContainer = document.getElementById("productContainer");
+    if (id === null || isNaN(id) || id < 0 || id >= meals.length) {
+      productContainer.innerHTML = "<p>Product not found.</p>";
+    } else {
+      const meal = meals[id];
+      productContainer.innerHTML = `
+        <div class="product-image">
+          <img src="${meal.image}" alt="${meal.name}">
+        </div>
+        <div class="product-info">
+          <h2>${meal.name}</h2>
+          <p>${meal.description}</p>
+          <h3>Ingredients</h3>
+          <p>${meal.ingredients}</p>
+          <h3>Nutrition Info</h3>
+          <p>Calories: ${meal.macros.calories} kcal, Fat: ${meal.macros.fat}g, Protein: ${meal.macros.protein}g, Carbs: ${meal.macros.carbs}g</p>
+        </div>
+      `;
+      // Set up nutrition charts and table based on meal.macros
+      setupNutritionCharts(meal.macros);
+      setupNutritionTable(meal.macros);
+    }
+    
+    // Setup Nutrition Charts using Chart.js
+    function setupNutritionCharts(macros) {
+      // Calculate percentages based on recommended values
+      const recommended = {
+        calories: 2000,
+        fat: 70,
+        protein: 50,
+        carbs: 300
+      };
+      const percentages = {
+        calories: Math.round((macros.calories / recommended.calories) * 100),
+        fat: Math.round((macros.fat / recommended.fat) * 100),
+        protein: Math.round((macros.protein / recommended.protein) * 100),
+        carbs: Math.round((macros.carbs / recommended.carbs) * 100)
+      };
+      
+      const commonOptions = {
+        responsive: true,
+        cutout: "70%",
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => context.label + ": " + context.parsed + "%"
+            }
           }
-        };
-        
-        mealDiv.innerHTML = `
-          <div class="nutrition-banner">
-            Cal: 500 F:20g C:40g P:40g
-          </div>
-          <div class="image-container">
-            <img src="${meal.image}" alt="${meal.name}">
-            <div class="overlay">
-              <h3>${meal.name}</h3>
-              <p>${meal.macros.calories} Cal, ${meal.macros.fat}g Fat, ${meal.macros.carbs}g Carbs, ${meal.macros.protein}g Protein</p>
-              <p>${meal.shortDesc}</p>
-            </div>
-          </div>
-          <div class="meal-info">
-            <h3>${meal.name}</h3>
-            <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
-          </div>
-          <div class="button-container">
-            <button onclick="showQtySection(event, ${index})">Quick Add</button>
-            <button onclick="viewDetails(${index})">View Details</button>
-          </div>
-          <div class="quick-add-controls" id="quickAdd-${index}">
-            <input type="number" id="quantity-${index}" min="1" value="1">
-            <button onclick="quickAdd(${index}, event)">Add</button>
-          </div>
-        `;
-        container.appendChild(mealDiv);
-      });
+        }
+      };
+      
+      function createDoughnutChart(canvasId, percentage, label) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: [label, 'Remaining'],
+            datasets: [{
+              data: [percentage, 100 - percentage],
+              backgroundColor: ['#4CAF50', '#ddd']
+            }]
+          },
+          options: commonOptions
+        });
+      }
+      
+      createDoughnutChart('caloriesChart', percentages.calories, 'Cal');
+      createDoughnutChart('fatChart', percentages.fat, 'Fat');
+      createDoughnutChart('proteinChart', percentages.protein, 'Protein');
+      createDoughnutChart('carbsChart', percentages.carbs, 'Carbs');
     }
     
-    // Show quick add controls and prevent propagation
-    function showQtySection(e, index) {
-      e.stopPropagation();
-      const control = document.getElementById(`quickAdd-${index}`);
-      control.style.display = "block";
+    // Setup Nutrition Table values
+    function setupNutritionTable(macros) {
+      const recommended = {
+        calories: 2000,
+        fat: 70,
+        protein: 50,
+        carbs: 300
+      };
+      const percentages = {
+        calories: Math.round((macros.calories / recommended.calories) * 100),
+        fat: Math.round((macros.fat / recommended.fat) * 100),
+        protein: Math.round((macros.protein / recommended.protein) * 100),
+        carbs: Math.round((macros.carbs / recommended.carbs) * 100)
+      };
+      document.getElementById("caloriesValue").innerText = macros.calories + " kcal";
+      document.getElementById("caloriesPercent").innerText = percentages.calories + "%";
+      document.getElementById("fatValue").innerText = macros.fat + " g";
+      document.getElementById("fatPercent").innerText = percentages.fat + "%";
+      document.getElementById("proteinValue").innerText = macros.protein + " g";
+      document.getElementById("proteinPercent").innerText = percentages.protein + "%";
+      document.getElementById("carbsValue").innerText = macros.carbs + " g";
+      document.getElementById("carbsPercent").innerText = percentages.carbs + "%";
     }
     
-    // Quick Add: get quantity, add item to cart, then hide controls
-    function quickAdd(index, e) {
-      e.stopPropagation();
-      const quantityInput = document.getElementById(`quantity-${index}`);
+    // Quick Add Section: Add product to cart from product page
+    function addProductToCart() {
+      const quantityInput = document.getElementById("productQuantity");
       let quantity = parseInt(quantityInput.value);
       if (isNaN(quantity) || quantity <= 0) quantity = 1;
-      const meal = meals[index];
+      if (id === null || isNaN(id) || id < 0 || id >= meals.length) return;
+      const meal = meals[id];
       const existingItem = cart.find(item => item.name === meal.name);
       if (existingItem) {
         existingItem.quantity += quantity;
@@ -426,32 +544,12 @@
       updateCart();
       updateCartDropdown();
       alert("Added to cart!");
-      document.getElementById(`quickAdd-${index}`).style.display = "none";
     }
     
     // Global Cart Functions
     function updateCart() {
-      const cartList = document.getElementById("cartList");
-      const totalPriceElement = document.getElementById("totalPrice");
-      cartList.innerHTML = "";
-      let total = 0;
-      cart.forEach((item, i) => {
-        total += item.price * item.quantity;
-        const li = document.createElement("li");
-        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
-        cartList.appendChild(li);
-      });
-      totalPriceElement.innerText = total.toFixed(2);
-      localStorage.setItem("cartData", JSON.stringify(cart));
-    }
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      updateCart();
+      // For product page, we update local storage and cart dropdown only
       updateCartDropdown();
-    }
-    function loadCart() {
-      const savedCart = localStorage.getItem("cartData");
-      return savedCart ? JSON.parse(savedCart) : [];
     }
     function updateCartDropdown() {
       const loadedCart = loadCart();
@@ -473,6 +571,10 @@
         });
       }
     }
+    function loadCart() {
+      const savedCart = localStorage.getItem("cartData");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
     function viewDetails(index) {
       window.location.href = "product.html?id=" + index;
     }
@@ -485,8 +587,6 @@
       if (savedCart) {
         cart = JSON.parse(savedCart);
       }
-      renderMeals();
-      updateCart();
       updateCartDropdown();
     });
   </script>
