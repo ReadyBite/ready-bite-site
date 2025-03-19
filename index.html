@@ -1,153 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ready Bite</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f5f5f5; color: #333; }
-        .meal-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
-        .meal { border: 1px solid #ccc; padding: 10px; width: 200px; background-color: #fff; }
-        .meal img { width: 150px; height: 150px; object-fit: cover; border-radius: 10px; }
-        .cart { margin-top: 20px; background-color: #333; color: white; padding: 15px; border-radius: 5px; }
-        .hidden { display: none; }
-        .feedback-section { margin-top: 50px; padding: 20px; background-color: #e8e8e8; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5); }
-        .modal input { width: 100%; padding: 8px; margin-top: 5px; }
-        .modal button { margin-top: 10px; background-color: #28a745; color: white; padding: 10px; border: none; cursor: pointer; }
-        button { background-color: #555; color: white; border: none; padding: 10px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ready Bite</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      background-color: #f5f5f5; 
+      color: #333; 
+    }
+    .meal-container { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      gap: 20px; 
+    }
+    .meal { 
+      border: 1px solid #ccc; 
+      padding: 10px; 
+      width: 200px; 
+      background-color: #fff; 
+    }
+    .meal img { 
+      width: 150px; 
+      height: 150px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+    }
+    .cart { 
+      margin-top: 20px; 
+      background-color: #333; 
+      color: white; 
+      padding: 15px; 
+      border-radius: 5px; 
+    }
+    .hidden { 
+      display: none; 
+    }
+    .feedback-section { 
+      margin-top: 50px; 
+      padding: 20px; 
+      background-color: #e8e8e8; 
+      text-align: left; 
+      max-width: 800px; 
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    /* Modal styles */
+    .modal { 
+      display: none; 
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      background: white; 
+      padding: 20px; 
+      border-radius: 10px; 
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5); 
+      z-index: 1000; 
+      width: 300px;
+    }
+    .modal input { 
+      width: 100%; 
+      padding: 8px; 
+      margin-top: 5px; 
+      margin-bottom: 10px;
+    }
+    .modal button { 
+      margin-top: 10px; 
+      background-color: #28a745; 
+      color: white; 
+      padding: 10px; 
+      border: none; 
+      cursor: pointer; 
+      width: 100%;
+    }
+    button { 
+      background-color: #555; 
+      color: white; 
+      border: none; 
+      padding: 10px; 
+      cursor: pointer; 
+    }
+    /* Optional overlay for modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+  </style>
 </head>
 <body>
-    <h1>Ready Bite</h1>
-    <nav>
-        <a href="index.html">Home</a> | <a href="about.html">About Us</a> | <a href="how-it-works.html">How It Works</a>
-    </nav>
-    <div class="meal-container" id="mealContainer"></div>
-    <div class="cart">
-        <h2>Cart</h2>
-        <ul id="cartList"></ul>
-        <p>Total: $<span id="totalPrice">0.00</span></p>
-        <button onclick="submitOrder()">Submit Order</button>
-    </div>
+  <h1>Ready Bite</h1>
+  <nav>
+    <a href="index.html">Home</a> | <a href="about.html">About Us</a> | <a href="how-it-works.html">How It Works</a>
+  </nav>
+  <div class="meal-container" id="mealContainer"></div>
+  <div class="cart">
+    <h2>Cart</h2>
+    <ul id="cartList"></ul>
+    <p>Total: $<span id="totalPrice">0.00</span></p>
+    <button onclick="submitOrder()">Submit Order</button>
+  </div>
 
-    <div class="feedback-section">
-        <h2>Feedback</h2>
-        <p>We value your feedback! Please let us know how we can improve.</p>
-        <label for="feedbackMessage">General Feedback:</label>
-        <textarea id="feedbackMessage" rows="4" style="width: 100%;" placeholder="Enter your feedback here..."></textarea>
-        <label for="rating">Rate your experience (1-5):</label>
-        <select id="rating">
-            <option value="1">1 - Poor</option>
-            <option value="2">2 - Fair</option>
-            <option value="3">3 - Good</option>
-            <option value="4">4 - Very Good</option>
-            <option value="5" selected>5 - Excellent</option>
-        </select>
-        <button onclick="sendFeedback()">Submit Feedback</button>
-    </div>
+  <div class="feedback-section">
+    <h2>Feedback</h2>
+    <p>We value your feedback! Please let us know how we can improve.</p>
+    <label for="feedbackMessage">General Feedback:</label>
+    <textarea id="feedbackMessage" rows="4" style="width: 100%;" placeholder="Enter your feedback here..."></textarea>
+    <label for="rating">Rate your experience (1-5):</label>
+    <select id="rating">
+      <option value="1">1 - Poor</option>
+      <option value="2">2 - Fair</option>
+      <option value="3">3 - Good</option>
+      <option value="4">4 - Very Good</option>
+      <option value="5" selected>5 - Excellent</option>
+    </select>
+    <button onclick="sendFeedback()">Submit Feedback</button>
+  </div>
 
-    <script>
-        const meals = [
-            { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
-            { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
-            { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef_adjusted_cropped_resized.png.png" },
-            { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas_adjusted_cropped_resized.png" },
-            { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas_adjusted_cropped_resized.png" },
-            { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo_adjusted_cropped_resized.png" },
-            { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken_adjusted_cropped_resized.png" },
-            { name: "Chicken Fajita", price: 10, image: "chicken_fajita_adjusted_cropped_resized.png" },
-            { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10] }
-        ];
+  <!-- Modal overlay -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <!-- Order Details Modal -->
+  <div class="modal" id="orderModal">
+    <h2>Enter Your Details</h2>
+    <form id="orderForm">
+      <label for="customerName">Name:</label>
+      <input type="text" id="customerName" name="customerName" required>
+      <label for="customerEmail">Email:</label>
+      <input type="email" id="customerEmail" name="customerEmail" required>
+      <label for="customerPhone">Phone Number:</label>
+      <input type="text" id="customerPhone" name="customerPhone" required>
+      <label for="customerAddress">Address:</label>
+      <input type="text" id="customerAddress" name="customerAddress" required>
+      <button type="submit">Submit Order</button>
+    </form>
+  </div>
 
-        let cart = [];
+  <script>
+    const meals = [
+      { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
+      { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
+      { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef_adjusted_cropped_resized.png.png" },
+      { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas_adjusted_cropped_resized.png" },
+      { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas_adjusted_cropped_resized.png" },
+      { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo_adjusted_cropped_resized.png" },
+      { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken_adjusted_cropped_resized.png" },
+      { name: "Chicken Fajita", price: 10, image: "chicken_fajita_adjusted_cropped_resized.png" },
+      { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10], image: "smoked_chicken_adjusted_cropped_resized.png" }
+    ];
 
-        function renderMeals() {
-            const container = document.getElementById("mealContainer");
-            container.innerHTML = "";
-            meals.forEach((meal, index) => {
-                let mealDiv = document.createElement("div");
-                mealDiv.className = "meal";
-                let inputField = meal.bulkOptions 
-                    ? `<select id="meal-${index}"> ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} </select>`
-                    : `<input type="number" id="meal-${index}" min="1" placeholder="Qty">`;
-                
-                mealDiv.innerHTML = `
-                    <img src="${meal.image}" alt="${meal.name}">
-                    <h3>${meal.name}</h3>
-                    <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
-                    ${inputField}
-                    <button onclick="addToCart(${index})">Add to Cart</button>
-                `;
-                container.appendChild(mealDiv);
-            });
-        }
+    let cart = [];
 
-        function addToCart(index) {
-            const quantityInput = document.getElementById(`meal-${index}`);
-            let quantity = parseInt(quantityInput.value);
-            if (isNaN(quantity) || quantity <= 0) return;
+    function renderMeals() {
+      const container = document.getElementById("mealContainer");
+      container.innerHTML = "";
+      meals.forEach((meal, index) => {
+        let mealDiv = document.createElement("div");
+        mealDiv.className = "meal";
+        let inputField = meal.bulkOptions 
+          ? `<select id="meal-${index}"> ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} </select>`
+          : `<input type="number" id="meal-${index}" min="1" placeholder="Qty">`;
+        
+        mealDiv.innerHTML = `
+          <img src="${meal.image}" alt="${meal.name}">
+          <h3>${meal.name}</h3>
+          <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
+          ${inputField}
+          <button onclick="addToCart(${index})">Add to Cart</button>
+        `;
+        container.appendChild(mealDiv);
+      });
+    }
 
-            let meal = meals[index];
-            let existingItem = cart.find(item => item.name === meal.name);
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({ name: meal.name, price: meal.price, quantity: quantity });
-            }
-            quantityInput.value = "";
-            updateCart();
-        }
+    function addToCart(index) {
+      const quantityInput = document.getElementById(`meal-${index}`);
+      let quantity = parseInt(quantityInput.value);
+      if (isNaN(quantity) || quantity <= 0) return;
 
-        function updateCart() {
-            const cartList = document.getElementById("cartList");
-            const totalPriceElement = document.getElementById("totalPrice");
-            cartList.innerHTML = "";
-            let total = 0;
+      let meal = meals[index];
+      let existingItem = cart.find(item => item.name === meal.name);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+      }
+      quantityInput.value = "";
+      updateCart();
+    }
 
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                let li = document.createElement("li");
-                li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
-                cartList.appendChild(li);
-            });
-            totalPriceElement.innerText = total.toFixed(2);
-        }
-function submitOrder() {
-    if (cart.length === 0) {
+    function updateCart() {
+      const cartList = document.getElementById("cartList");
+      const totalPriceElement = document.getElementById("totalPrice");
+      cartList.innerHTML = "";
+      let total = 0;
+
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        let li = document.createElement("li");
+        li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+        cartList.appendChild(li);
+      });
+      totalPriceElement.innerText = total.toFixed(2);
+    }
+
+    function submitOrder() {
+      if (cart.length === 0) {
         alert("Your cart is empty. Add meals before submitting an order.");
         return;
+      }
+      // Display the modal and its overlay
+      document.getElementById("orderModal").style.display = "block";
+      document.getElementById("modalOverlay").style.display = "block";
     }
 
-    let customerName = prompt("Enter your name:");
-    let customerEmail = prompt("Enter your email:");
-    let customerPhone = prompt("Enter your phone number (000-000-0000):");
-    let customerAddress = prompt("Enter your full address (Street, City, State, ZIP):");
+    // Close modal when clicking outside of it (overlay click)
+    document.getElementById("modalOverlay").addEventListener("click", function() {
+      document.getElementById("orderModal").style.display = "none";
+      document.getElementById("modalOverlay").style.display = "none";
+    });
 
-    if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
+    // Handle order form submission inside the modal
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let customerName = document.getElementById("customerName").value.trim();
+      let customerEmail = document.getElementById("customerEmail").value.trim();
+      let customerPhone = document.getElementById("customerPhone").value.trim();
+      let customerAddress = document.getElementById("customerAddress").value.trim();
+
+      if (!customerName || !customerEmail || !customerPhone || !customerAddress) {
         alert("All fields are required. Please fill out all information.");
         return;
-    }
+      }
 
-    let orderDetails = cart.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
-    let totalPrice = document.getElementById("totalPrice").innerText;
-    let message = `Name: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\n\nOrder List:\n${orderDetails}\n\nTotal: $${totalPrice}\n\nPayment via Venmo: @Matt-Hanson-107`;
+      let orderDetails = cart.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
+      let totalPrice = document.getElementById("totalPrice").innerText;
+      let message = `Name: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\n\nOrder List:\n${orderDetails}\n\nTotal: $${totalPrice}\n\nPayment via Venmo: @Matt-Hanson-107`;
 
-    fetch('https://formspree.io/f/xwplpgbp', {
+      fetch('https://formspree.io/f/xwplpgbp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            email: 'readybitemeals@gmail.com',
-            message: message
+          email: 'readybitemeals@gmail.com',
+          message: message
         })
-    }).then(response => response.json())
-    .then(data => {
+      })
+      .then(response => response.json())
+      .then(data => {
         alert("Your order has been received! A confirmation email has been sent.");
         cart = [];
         updateCart();
-    }).catch(error => alert("Error sending order. Please try again."));
-}
-        renderMeals();
-    </script>
+        // Hide the modal and overlay
+        document.getElementById("orderModal").style.display = "none";
+        document.getElementById("modalOverlay").style.display = "none";
+        // Reset the form fields
+        document.getElementById("orderForm").reset();
+      })
+      .catch(error => {
+        alert("Error sending order. Please try again.");
+      });
+    });
+
+    // Dummy sendFeedback function
+    function sendFeedback() {
+      alert("Feedback submitted. Thank you!");
+    }
+
+    renderMeals();
+  </script>
 </body>
 </html>
