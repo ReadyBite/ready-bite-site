@@ -62,7 +62,7 @@
     <!-- Product details will be inserted here by JavaScript -->
   </div>
   <script>
-    // Sample meals array with extra details for all 9 products
+    // Sample meals array with extra details for all products
     const meals = [
       {
         name: "Beef Spaghetti",
@@ -133,40 +133,4 @@
         price: 12,
         bulkOptions: [2, 4, 6, 8, 10],
         image: "smoked_chicken_adjusted_cropped_resized.png",
-        description: "Bulk order of smoked BBQ chicken with special seasoning.",
-        ingredients: "Chicken, BBQ seasoning, potatoes, mixed veggies",
-        macros: "Calories: 750, Protein: 42g, Carbs: 60g, Fat: 28g"
-      }
-    ];
-
-    // Get the query parameter 'id' from the URL
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-
-    const productContent = document.getElementById("productContent");
-
-    if (id === null || isNaN(id) || id < 0 || id >= meals.length) {
-      productContent.innerHTML = "<p>Product not found.</p>";
-    } else {
-      const meal = meals[id];
-      productContent.innerHTML = `
-        <div class="product-container">
-          <div class="product-image">
-            <img src="${meal.image}" alt="${meal.name}">
-          </div>
-          <div class="product-info">
-            <h2>${meal.name}</h2>
-            <p>${meal.description}</p>
-          </div>
-        </div>
-        <div class="product-details">
-          <h3>Ingredients</h3>
-          <p>${meal.ingredients}</p>
-          <h3>Nutrition Info</h3>
-          <p>${meal.macros}</p>
-        </div>
-      `;
-    }
-  </script>
-</body>
-</html>
+        description: "Bulk order of smoked BBQ 
