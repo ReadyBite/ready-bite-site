@@ -31,6 +31,9 @@
             <input type="text" id="state" name="state" placeholder="State" required>
             <input type="text" id="zip" name="zip" placeholder="ZIP Code" required>
 
+            <h3>Your Order:</h3>
+            <ul id="orderItems"></ul>
+
             <h3>Total Bill: $<span id="totalBill">0.00</span></h3>
             <p>Please send your payment to <strong>Venmo: @Matt-Hanson-107</strong></p>
 
@@ -39,6 +42,26 @@
     </div>
 
     <script>
+        // Load order details from localStorage
+        document.addEventListener("DOMContentLoaded", function() {
+            const totalBill = localStorage.getItem("totalPrice") || "0.00";
+            document.getElementById("totalBill").innerText = totalBill;
+
+            const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+            const orderList = document.getElementById("orderItems");
+            orderList.innerHTML = "";
+
+            if (cartItems.length === 0) {
+                orderList.innerHTML = "<li>No items in cart.</li>";
+            } else {
+                cartItems.forEach(item => {
+                    let li = document.createElement("li");
+                    li.innerText = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`;
+                    orderList.appendChild(li);
+                });
+            }
+        });
+
         function submitOrder() {
             const fullName = document.getElementById("fullName").value;
             const email = document.getElementById("email").value;
@@ -47,21 +70,26 @@
             const city = document.getElementById("city").value;
             const state = document.getElementById("state").value;
             const zip = document.getElementById("zip").value;
-            const totalBill = localStorage.getItem("totalPrice") || "0.00";
-            
+            const totalBill = document.getElementById("totalBill").innerText;
+            const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
             if (!fullName || !email || !phone || !address || !city || !state || !zip) {
                 alert("Please fill in all fields.");
                 return;
             }
-            
-            document.getElementById("totalBill").innerText = totalBill;
-            
-            const orderDetails = `Name: ${fullName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}, ${city}, ${state}, ${zip}\nTotal Bill: $${totalBill}\nPlease send payment to Venmo: @Matt-Hanson-107`;
-            
+
+            const orderDetails = cartItems.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
+            const fullOrder = `Name: ${fullName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}, ${city}, ${state}, ${zip}\n\nOrder Details:\n${orderDetails}\n\nTotal Bill: $${totalBill}\nPlease send payment to Venmo: @Matt-Hanson-107`;
+
             alert("Your order has been received! Please send your payment via Venmo to @Matt-Hanson-107. Thank you for choosing Ready Bite!");
-            
-            console.log("Order Submitted:", orderDetails);
-            sendReceipt(email, orderDetails);
+
+            console.log("Order Submitted:", fullOrder);
+            sendReceipt(email, fullOrder);
+
+            // Clear cart after order submission
+            localStorage.removeItem("cartItems");
+            localStorage.removeItem("totalPrice");
+
             window.location.href = "index.html";
         }
 
@@ -77,10 +105,6 @@
             .then(data => console.log("Receipt sent successfully."))
             .catch(error => console.error("Error sending receipt:", error));
         }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("totalBill").innerText = localStorage.getItem("totalPrice") || "0.00";
-        });
     </script>
 </body>
 </html>
