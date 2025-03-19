@@ -23,6 +23,10 @@
       font-size: 2em;
       font-weight: bold;
     }
+    .company-name a {
+      text-decoration: none;
+      color: inherit;
+    }
     .header-right {
       display: flex;
       align-items: center;
@@ -71,6 +75,17 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
+    /* Nutrition Banner */
+    .nutrition-banner {
+      background-color: #ccc;
+      color: #333;
+      width: 100%;
+      text-align: center;
+      padding: 4px 0;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
     /* Meal Grid */
     .meal-container {
       display: grid;
@@ -78,6 +93,11 @@
       gap: 20px;
       justify-items: center;
       padding: 20px;
+    }
+    @media (max-width: 768px) {
+      .meal-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     .meal {
       background-color: #fff;
@@ -97,7 +117,7 @@
     }
     .meal h3 {
       margin: 10px 0 5px 0;
-      text-align: center; /* Center the meal name */
+      text-align: center;
     }
     .meal p {
       margin: 5px 0;
@@ -115,6 +135,17 @@
       color: white;
       border: none;
       cursor: pointer;
+    }
+    /* Hidden quantity input and add button (for Quick Add) */
+    .hidden-qty {
+      display: none;
+      margin-top: 5px;
+    }
+    .qty-message {
+      color: #c00;
+      font-size: 0.9em;
+      margin-top: 5px;
+      display: none;
     }
     /* Cart Section */
     .cart-section {
@@ -150,27 +181,11 @@
       background-color: #e8e8e8;
       text-align: left;
     }
-    /* Responsive for mobile: 2 meals per row */
-    @media (max-width: 768px) {
-      .meal-container {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    /* Hide quantity input & "Add" button by default; show after Quick Add click */
-    .hidden-qty {
-      display: none;
-      margin-top: 5px;
-    }
-    .qty-message {
-      color: #c00;
-      font-size: 0.9em;
-      margin-top: 5px;
-    }
   </style>
 </head>
 <body>
   <header>
-    <div class="company-name">Ready Bite</div>
+    <div class="company-name"><a href="index.html">Ready Bite</a></div>
     <div class="header-right">
       <nav>
         <a href="index.html">Home</a>
@@ -233,16 +248,17 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        
-        // Quick Add approach: initially hide the quantity input & "Add" button
-        // We'll toggle them when "Quick Add" is clicked
-        let inputField = meal.bulkOptions 
+        // Insert Nutrition Banner at top of each meal box
+        const nutritionBanner = `<div class="nutrition-banner">Cal: 500 F: 20g C:40g P:40g</div>`;
+        // For Quick Add: initially hide quantity input and Add button
+        let qtyControl = meal.bulkOptions 
           ? `<select id="qtySelect-${index}" class="hidden-qty"> 
                ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} 
              </select>`
           : `<input type="number" id="qtyInput-${index}" min="1" class="hidden-qty" value="1">`;
         
         mealDiv.innerHTML = `
+          ${nutritionBanner}
           <img src="${meal.image}" alt="${meal.name}">
           <h3>${meal.name}</h3>
           <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
@@ -250,35 +266,34 @@
             <button onclick="showQtySection(${index})">Quick Add</button>
             <button onclick="viewDetails(${index})">View Details</button>
           </div>
-          <p id="qtyMessage-${index}" class="qty-message" style="display:none;">Select quantity</p>
-          ${inputField}
-          <button id="addBtn-${index}" class="hidden-qty" onclick="addToCart(${index})">Add</button>
+          <p id="qtyMessage-${index}" class="qty-message">Select quantity</p>
+          ${qtyControl}
+          <button id="addBtn-${index}" class="hidden-qty" onclick="quickAdd(${index})">Add</button>
         `;
         container.appendChild(mealDiv);
       });
     }
     
-    // Show quantity input & "Add" button, plus a small message
+    // Show quantity input and Add button when Quick Add is clicked
     function showQtySection(index) {
       document.getElementById(`qtyMessage-${index}`).style.display = "block";
       const selectEl = document.getElementById(`qtySelect-${index}`);
       const inputEl = document.getElementById(`qtyInput-${index}`);
       const addBtn = document.getElementById(`addBtn-${index}`);
-      
       if (selectEl) selectEl.style.display = "inline-block";
       if (inputEl) inputEl.style.display = "inline-block";
       addBtn.style.display = "inline-block";
     }
     
-    function addToCart(index) {
+    // Quick Add: add item to cart and then hide the quantity input controls
+    function quickAdd(index) {
       const meal = meals[index];
       let quantity = 1;
       const selectEl = document.getElementById(`qtySelect-${index}`);
       const inputEl = document.getElementById(`qtyInput-${index}`);
-      
-      if (selectEl) {
+      if (selectEl && selectEl.style.display !== "none") {
         quantity = parseInt(selectEl.value);
-      } else if (inputEl) {
+      } else if (inputEl && inputEl.style.display !== "none") {
         quantity = parseInt(inputEl.value);
       }
       if (isNaN(quantity) || quantity <= 0) quantity = 1;
@@ -292,6 +307,11 @@
       updateCart();
       updateCartDropdown();
       alert("Added to cart!");
+      // Hide quantity controls after adding
+      document.getElementById(`qtyMessage-${index}`).style.display = "none";
+      if (selectEl) selectEl.style.display = "none";
+      if (inputEl) inputEl.style.display = "none";
+      document.getElementById(`addBtn-${index}`).style.display = "none";
     }
     
     function updateCart() {
@@ -302,8 +322,7 @@
       cart.forEach((item, i) => {
         total += item.price * item.quantity;
         const li = document.createElement("li");
-        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} 
-                        <button onclick="removeFromCart(${i})">Remove</button>`;
+        li.innerHTML = `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)} <button onclick="removeFromCart(${i})">Remove</button>`;
         cartList.appendChild(li);
       });
       totalPriceElement.innerText = total.toFixed(2);
@@ -335,13 +354,11 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
-      // Sum total items across all meal types
       let totalItems = 0;
       loadedCart.forEach(item => {
         totalItems += item.quantity;
       });
       document.getElementById("cartCount").innerText = totalItems;
-      
       const cartDropdownList = document.getElementById("cartDropdownList");
       cartDropdownList.innerHTML = "";
       const displayItems = loadedCart.slice(0, 4);
