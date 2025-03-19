@@ -50,13 +50,13 @@
     <script>
         const meals = [
             { name: "Beef Spaghetti", price: 10, image: "spaghetti.png" },
-            { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken.png" },
-            { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef.png" },
-            { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas.png" },
-            { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas.png" },
-            { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo.png" },
-            { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken.png" },
-            { name: "Chicken Fajita", price: 10, image: "chicken_fajita.png" },
+            { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
+            { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef_adjusted_cropped_resized.png" },
+            { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas_adjusted_cropped_resized.png" },
+            { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas_adjusted_cropped_resized.png" },
+            { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo_adjusted_cropped_resized.png" },
+            { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken_adjusted_cropped_resized.png" },
+            { name: "Chicken Fajita", price: 10, image: "chicken_fajita_adjusted_cropped_resized.png" },
             { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10] }
         ];
 
@@ -119,7 +119,7 @@ function submitOrder() {
         return;
     }
 
-    let customerName = prompt("Enter your full name:");
+    let customerName = prompt("Enter your name:");
     let customerEmail = prompt("Enter your email:");
     let customerPhone = prompt("Enter your phone number (000-000-0000):");
     let customerAddress = prompt("Enter your full address (Street, City, State, ZIP):");
@@ -133,7 +133,7 @@ function submitOrder() {
     let totalPrice = document.getElementById("totalPrice").innerText;
     let message = `Name: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\n\nOrder List:\n${orderDetails}\n\nTotal: $${totalPrice}\n\nPayment via Venmo: @Matt-Hanson-107`;
 
-    fetch('https://formspree.io/f/mknljgby', {
+    fetch('https://formspree.io/f/xwplpgbp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
