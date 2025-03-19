@@ -11,26 +11,37 @@
       margin: 0;
       padding: 20px;
     }
-    .nav-links {
-      text-align: center;
-      margin-bottom: 20px;
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 50px;
+      background-color: #eee;
     }
-    .nav-links a {
+    .company-name {
+      font-size: 2em;
+      font-weight: bold;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    nav {
+      margin-right: 20px;
+    }
+    nav a {
+      margin-right: 10px;
       text-decoration: none;
       color: #333;
-      margin: 0 10px;
+      font-size: 1.2em;
     }
-    /* Global Cart Dropdown */
     .cart-dropdown {
-      position: fixed;
-      top: 10px;
-      right: 10px;
       background-color: #333;
       color: white;
       padding: 10px;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000;
+      position: relative;
     }
     .cart-dropdown:hover .cart-dropdown-content {
       display: block;
@@ -60,7 +71,7 @@
     }
     .order-container {
       max-width: 600px;
-      margin: 0 auto;
+      margin: 20px auto;
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
@@ -98,20 +109,42 @@
       width: 100%;
       font-size: 1em;
     }
+    .cart-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .cart-section li {
+      margin-bottom: 10px;
+      font-size: 1em;
+    }
+    .cart-section li button {
+      margin-left: 10px;
+      background-color: #c00;
+      border: none;
+      color: white;
+      padding: 2px 6px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
-  <div class="nav-links">
-    <a href="index.html">Back to Main</a>
-  </div>
-  
-  <!-- Global Cart Dropdown -->
-  <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
-    Cart (<span id="cartCount">0</span>)
-    <div class="cart-dropdown-content" id="cartDropdownContent">
-      <ul id="cartDropdownList"></ul>
+  <header>
+    <div class="company-name">Ready Bite</div>
+    <div class="header-right">
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="how-it-works.html">How It Works</a>
+      </nav>
+      <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+        Cart (<span id="cartCount">0</span>)
+        <div class="cart-dropdown-content" id="cartDropdownContent">
+          <ul id="cartDropdownList"></ul>
+        </div>
+      </div>
     </div>
-  </div>
+  </header>
   
   <h1>Ready Bite</h1>
   <h2>Review Your Order & Checkout</h2>
@@ -174,7 +207,6 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
-      // Sum the total quantity across all meal types
       let totalItems = 0;
       loadedCart.forEach(item => {
         totalItems += item.quantity;
@@ -216,6 +248,14 @@
     
     function goToOrderPage() {
       window.location.href = "order.html";
+    }
+    
+    function removeFromCart(index) {
+      let loadedCart = loadCart();
+      loadedCart.splice(index, 1);
+      saveCart(loadedCart);
+      updateCartSummary();
+      updateCartDropdown();
     }
     
     function setupFormSubmission() {
