@@ -20,6 +20,44 @@
       color: #333;
       margin: 0 10px;
     }
+    /* Cart Dropdown Styles */
+    .cart-dropdown {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .cart-dropdown:hover .cart-dropdown-content {
+      display: block;
+    }
+    .cart-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      min-width: 200px;
+      z-index: 1001;
+    }
+    .cart-dropdown-content ul {
+      list-style: none;
+      padding: 10px;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .cart-dropdown-content li {
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
     .product-container {
       display: flex;
       align-items: center;
@@ -52,17 +90,55 @@
     .product-details h3 {
       margin-top: 20px;
     }
+    .add-to-cart-section {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .add-to-cart-section input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+    .add-to-cart-section button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
+  <!-- Navigation Link -->
   <div class="nav-links">
     <a href="index.html">Back to Main</a>
   </div>
+  
+  <!-- Cart Dropdown in Top Right -->
+  <div id="cartDropdown" class="cart-dropdown" onclick="goToOrderPage()">
+    Cart (<span id="cartCount">0</span>)
+    <div class="cart-dropdown-content" id="cartDropdownContent">
+      <ul id="cartDropdownList">
+        <!-- Cart items will be populated here -->
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Product Content -->
   <div id="productContent">
     <!-- Product details will be inserted here by JavaScript -->
   </div>
+  
+  <!-- Add to Cart Section -->
+  <div class="add-to-cart-section">
+    <label for="quantityInput">Quantity:</label>
+    <input type="number" id="quantityInput" min="1" value="1">
+    <button onclick="addToCartFromProduct()">Add to Cart</button>
+  </div>
+  
   <script>
-    // Sample meals array with extra details for all products
+    // Sample meals array with extra details
     const meals = [
       {
         name: "Beef Spaghetti",
@@ -133,4 +209,101 @@
         price: 12,
         bulkOptions: [2, 4, 6, 8, 10],
         image: "smoked_chicken_adjusted_cropped_resized.png",
-        description: "Bulk order of smoked BBQ 
+        description: "Bulk order of smoked BBQ chicken with special seasoning.",
+        ingredients: "Chicken, BBQ seasoning, potatoes, mixed veggies",
+        macros: "Calories: 750, Protein: 42g, Carbs: 60g, Fat: 28g"
+      }
+    ];
+
+    // Get the product ID from URL query parameter "id"
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    const productContent = document.getElementById("productContent");
+
+    if (id === null || isNaN(id) || id < 0 || id >= meals.length) {
+      productContent.innerHTML = "<p>Product not found.</p>";
+    } else {
+      const meal = meals[id];
+      productContent.innerHTML = `
+        <div class="product-container">
+          <div class="product-image">
+            <img src="${meal.image}" alt="${meal.name}">
+          </div>
+          <div class="product-info">
+            <h2>${meal.name}</h2>
+            <p>${meal.description}</p>
+          </div>
+        </div>
+        <div class="product-details">
+          <h3>Ingredients</h3>
+          <p>${meal.ingredients}</p>
+          <h3>Nutrition Info</h3>
+          <p>${meal.macros}</p>
+        </div>
+      `;
+    }
+
+    // CART FUNCTIONS
+
+    // Load cart from localStorage (returns an array)
+    function loadCart() {
+      const savedCart = localStorage.getItem("cartData");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+
+    // Save cart to localStorage
+    function saveCart(cart) {
+      localStorage.setItem("cartData", JSON.stringify(cart));
+    }
+
+    // Update the dropdown content and count
+    function updateCartDropdown() {
+      const cart = loadCart();
+      document.getElementById("cartCount").innerText = cart.length;
+      const cartDropdownList = document.getElementById("cartDropdownList");
+      cartDropdownList.innerHTML = "";
+      const displayItems = cart.slice(0, 4); // up to 4 items
+      if (displayItems.length === 0) {
+        const li = document.createElement("li");
+        li.innerText = "Cart is empty";
+        cartDropdownList.appendChild(li);
+      } else {
+        displayItems.forEach(item => {
+          const li = document.createElement("li");
+          li.innerText = `${item.quantity}x ${item.name}`;
+          cartDropdownList.appendChild(li);
+        });
+      }
+    }
+
+    // Redirect to the order page when cart dropdown is clicked
+    function goToOrderPage() {
+      window.location.href = "order.html";
+    }
+
+    // Add current product to the cart from product page
+    function addToCartFromProduct() {
+      if (id === null || isNaN(id) || id < 0 || id >= meals.length) return;
+      const cart = loadCart();
+      const meal = meals[id];
+      const quantityInput = document.getElementById("quantityInput");
+      let quantity = parseInt(quantityInput.value);
+      if (isNaN(quantity) || quantity <= 0) quantity = 1;
+      // Check if meal already exists in cart
+      const existingItem = cart.find(item => item.name === meal.name);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
+      }
+      saveCart(cart);
+      updateCartDropdown();
+      alert("Added to cart!");
+    }
+
+    // Initialize cart dropdown on page load
+    updateCartDropdown();
+  </script>
+</body>
+</html>
