@@ -17,7 +17,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 50px;
-      background-color: #eee;
+      background-color: #eeeeee;
     }
     .company-name {
       font-size: 2em;
@@ -42,7 +42,7 @@
     }
     /* Global Cart Dropdown */
     .cart-dropdown {
-      background-color: #333;
+      background-color: #4CAF50;
       color: white;
       padding: 10px;
       border-radius: 5px;
@@ -77,7 +77,7 @@
     }
     /* Nutrition Banner */
     .nutrition-banner {
-      background-color: #ccc;
+      background-color: #ddd;
       color: #333;
       width: 100%;
       text-align: center;
@@ -131,7 +131,7 @@
     .button-container button {
       flex: 1;
       padding: 8px;
-      background-color: #555;
+      background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
@@ -151,7 +151,7 @@
     .cart-section {
       max-width: 400px;
       margin: 20px auto;
-      background-color: #333;
+      background-color: #4CAF50;
       color: white;
       padding: 15px;
       border-radius: 5px;
@@ -167,7 +167,7 @@
     }
     .cart-section li button {
       margin-left: 10px;
-      background-color: #c00;
+      background-color: #F44336;
       border: none;
       color: white;
       padding: 2px 6px;
@@ -227,7 +227,7 @@
   </div>
   
   <script>
-    // Sample meals array
+    // Sample meals array (update nutrition numbers as needed later)
     const meals = [
       { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
       { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
@@ -248,7 +248,7 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        // Insert Nutrition Banner at top of each meal box
+        // Nutrition banner at top of each meal card
         const nutritionBanner = `<div class="nutrition-banner">Cal: 500 F: 20g C:40g P:40g</div>`;
         // For Quick Add: initially hide quantity input and Add button
         let qtyControl = meal.bulkOptions 
@@ -285,7 +285,7 @@
       addBtn.style.display = "inline-block";
     }
     
-    // Quick Add: add item to cart and then hide the quantity input controls
+    // Quick Add: add item to cart and then hide the quantity controls
     function quickAdd(index) {
       const meal = meals[index];
       let quantity = 1;
