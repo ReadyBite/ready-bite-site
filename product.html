@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Ready Bite - Product Details</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Include Chart.js CDN -->
+  <!-- Include Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -70,12 +70,14 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
+    /* Product Content */
     .product-container {
       display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-      justify-content: center;
       flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
     }
     .product-image {
       flex: 1;
@@ -96,22 +98,55 @@
       margin: 0 0 10px 0;
       font-weight: bold;
     }
-    .product-details {
-      text-align: left;
-      max-width: 800px;
-      margin: 20px auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    .product-info p {
+      line-height: 1.5;
     }
-    .product-details h3 {
-      margin-top: 20px;
-    }
-    /* Chart container */
-    .chart-container {
+    /* Nutrition Charts Grid */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
       max-width: 400px;
       margin: 20px auto;
+    }
+    .chart-item {
+      text-align: center;
+    }
+    .chart-item canvas {
+      width: 100px !important;
+      height: 100px !important;
+    }
+    .chart-item p {
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    /* Nutrition Table */
+    .nutrition-table {
+      max-width: 400px;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    .nutrition-table th, .nutrition-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .nutrition-table th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    /* Back Button */
+    .back-button {
+      text-align: center;
+      margin: 20px;
+    }
+    .back-button a {
+      text-decoration: none;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.1em;
     }
   </style>
 </head>
@@ -131,50 +166,143 @@
     </div>
   </header>
   
-  <div id="productContent">
+  <!-- Product Details Section -->
+  <div class="product-container" id="productContent">
     <!-- Product details will be inserted here by JavaScript -->
   </div>
   
-  <!-- Nutrition Chart Section -->
-  <div class="chart-container">
-    <canvas id="nutritionChart"></canvas>
+  <!-- Nutrition Charts Grid -->
+  <div class="chart-grid">
+    <div class="chart-item">
+      <canvas id="caloriesChart"></canvas>
+      <p>Calories</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="fatChart"></canvas>
+      <p>Fat</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="proteinChart"></canvas>
+      <p>Protein</p>
+    </div>
+    <div class="chart-item">
+      <canvas id="carbsChart"></canvas>
+      <p>Carbs</p>
+    </div>
+  </div>
+  
+  <!-- Nutrition Table -->
+  <table class="nutrition-table">
+    <tr>
+      <th>Nutrient</th>
+      <th>Amount</th>
+      <th>% Daily Value</th>
+    </tr>
+    <tr>
+      <td>Calories</td>
+      <td id="caloriesValue"></td>
+      <td id="caloriesPercent"></td>
+    </tr>
+    <tr>
+      <td>Fat</td>
+      <td id="fatValue"></td>
+      <td id="fatPercent"></td>
+    </tr>
+    <tr>
+      <td>Protein</td>
+      <td id="proteinValue"></td>
+      <td id="proteinPercent"></td>
+    </tr>
+    <tr>
+      <td>Carbs</td>
+      <td id="carbsValue"></td>
+      <td id="carbsPercent"></td>
+    </tr>
+  </table>
+  
+  <div class="back-button">
+    <a href="index.html">Back to Main</a>
   </div>
   
   <script>
-    // Sample meals array with extra details
+    // Expanded sample meals array with all nine meals
     const meals = [
       {
         name: "Beef Spaghetti",
         price: 10,
         image: "spaghetti_adjusted_cropped_resized.png",
-        description: "A hearty spaghetti dish with rich beef sauce.",
+        description: "A hearty spaghetti dish with a rich beef sauce.",
         ingredients: "Beef, spaghetti, tomatoes, garlic, basil, oregano",
-        macros: "Calories: 500, Protein: 40g, Carbs: 40g, Fats: 20g"
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
       },
       {
         name: "Asian Chicken and Rice w/ Veggie Mix",
         price: 10,
         image: "asian_chicken_adjusted_cropped_resized.png",
-        description: "Tender chicken with rice and vibrant veggies, tossed in a savory sauce.",
+        description: "Tender chicken with rice and vibrant veggies in a savory sauce.",
         ingredients: "Chicken, rice, broccoli, carrots, bell peppers, soy sauce, ginger",
-        macros: "Calories: 500, Protein: 40g, Carbs: 40g, Fats: 20g"
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
       },
       {
         name: "Bulgogi Beef and Rice w/ Veggie Mix",
         price: 10,
         image: "bulgogi_beef_adjusted_cropped_resized.png.png",
-        description: "Marinated bulgogi beef served over rice with a medley of stir-fried vegetables.",
+        description: "Marinated bulgogi beef served over rice with a mix of stir-fried vegetables.",
         ingredients: "Beef, rice, bell peppers, onions, soy sauce, sugar, garlic, sesame oil",
-        macros: "Calories: 500, Protein: 40g, Carbs: 40g, Fats: 20g"
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
       },
-      // ... add more meals as needed
+      {
+        name: "Beef Enchiladas",
+        price: 10,
+        image: "beef_enchiladas_adjusted_cropped_resized.png",
+        description: "Delicious beef enchiladas with spicy sauce and melted cheese.",
+        ingredients: "Beef, tortillas, cheese, enchilada sauce, onions, spices",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      },
+      {
+        name: "Chicken Enchiladas",
+        price: 10,
+        image: "chicken_enchiladas_adjusted_cropped_resized.png",
+        description: "Tasty chicken enchiladas with a hint of cumin and melted cheese.",
+        ingredients: "Chicken, tortillas, cheese, enchilada sauce, garlic, spices",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      },
+      {
+        name: "Chicken Alfredo",
+        price: 10,
+        image: "chicken_alfredo_adjusted_cropped_resized.png",
+        description: "Creamy chicken alfredo pasta with a rich, savory sauce.",
+        ingredients: "Chicken, pasta, cream, parmesan, garlic, butter",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      },
+      {
+        name: "Smoked BBQ Chicken w/ Potatoes",
+        price: 10,
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        description: "Smoked BBQ chicken served with crispy roasted potatoes.",
+        ingredients: "Chicken, potatoes, BBQ sauce, herbs, spices",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      },
+      {
+        name: "Chicken Fajita",
+        price: 10,
+        image: "chicken_fajita_adjusted_cropped_resized.png",
+        description: "Sizzling chicken fajitas with bell peppers and onions.",
+        ingredients: "Chicken, bell peppers, onions, spices, tortillas",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      },
+      {
+        name: "Smoked BBQ Chicken Bulk",
+        price: 12,
+        bulkOptions: [2, 4, 6, 8, 10],
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        description: "Bulk order of smoked BBQ chicken with special seasoning.",
+        ingredients: "Chicken, BBQ seasoning, potatoes, mixed veggies",
+        macros: { calories: 500, fat: 20, protein: 40, carbs: 40 }
+      }
     ];
     
-    // For this demo, we’ll use the nutrition data from the nutrition banner: Carbs: 40, Protein: 40, Fats: 20
-    // In a real-world scenario, you’d store these as numeric values in your meals array.
-    const defaultNutrition = { carbs: 40, protein: 40, fats: 20 };
-    
-    // Get product ID from URL query parameter "id"
+    // Get the product ID from URL query parameter "id"
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     
@@ -185,23 +313,84 @@
     } else {
       const meal = meals[id];
       productContent.innerHTML = `
-        <div class="product-container">
-          <div class="product-image">
-            <img src="${meal.image}" alt="${meal.name}">
-          </div>
-          <div class="product-info">
-            <h2>${meal.name}</h2>
-            <p>${meal.description}</p>
-            <h3>Ingredients</h3>
-            <p>${meal.ingredients}</p>
-            <h3>Nutrition Info</h3>
-            <p>${meal.macros}</p>
-          </div>
+        <div class="product-image">
+          <img src="${meal.image}" alt="${meal.name}">
+        </div>
+        <div class="product-info">
+          <h2>${meal.name}</h2>
+          <p>${meal.description}</p>
+          <h3>Ingredients</h3>
+          <p>${meal.ingredients}</p>
+          <h3>Nutrition Info</h3>
+          <p>Calories: ${meal.macros.calories} kcal, Fat: ${meal.macros.fat}g, Protein: ${meal.macros.protein}g, Carbs: ${meal.macros.carbs}g</p>
         </div>
       `;
+      
+      // Use the meal's nutrition data for the charts and table
+      var mealNutrition = meal.macros;
     }
     
-    // Global Cart Dropdown Functions (similar to previous examples)
+    // Recommended daily values
+    const recommended = {
+      calories: 2000,
+      fat: 70,
+      protein: 50,
+      carbs: 300
+    };
+    
+    // Calculate percentages for each nutrient
+    const percentages = {
+      calories: Math.round((mealNutrition.calories / recommended.calories) * 100),
+      fat: Math.round((mealNutrition.fat / recommended.fat) * 100),
+      protein: Math.round((mealNutrition.protein / recommended.protein) * 100),
+      carbs: Math.round((mealNutrition.carbs / recommended.carbs) * 100)
+    };
+    
+    // Set table values
+    document.getElementById("caloriesValue").innerText = mealNutrition.calories + " kcal";
+    document.getElementById("caloriesPercent").innerText = percentages.calories + "%";
+    document.getElementById("fatValue").innerText = mealNutrition.fat + " g";
+    document.getElementById("fatPercent").innerText = percentages.fat + "%";
+    document.getElementById("proteinValue").innerText = mealNutrition.protein + " g";
+    document.getElementById("proteinPercent").innerText = percentages.protein + "%";
+    document.getElementById("carbsValue").innerText = mealNutrition.carbs + " g";
+    document.getElementById("carbsPercent").innerText = percentages.carbs + "%";
+    
+    // Setup Chart.js doughnut charts for each nutrient
+    const commonOptions = {
+      responsive: true,
+      cutout: "70%",
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => context.label + ": " + context.parsed + "%"
+          }
+        }
+      }
+    };
+    
+    function createDoughnutChart(canvasId, percentage, label) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: [label, 'Remaining'],
+          datasets: [{
+            data: [percentage, 100 - percentage],
+            backgroundColor: ['#4CAF50', '#ddd']
+          }]
+        },
+        options: commonOptions
+      });
+    }
+    
+    createDoughnutChart('caloriesChart', percentages.calories, 'Cal');
+    createDoughnutChart('fatChart', percentages.fat, 'Fat');
+    createDoughnutChart('proteinChart', percentages.protein, 'Protein');
+    createDoughnutChart('carbsChart', percentages.carbs, 'Carbs');
+    
+    // Global Cart Dropdown Functions (simplified example)
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
@@ -234,39 +423,6 @@
     
     document.addEventListener("DOMContentLoaded", function() {
       updateCartDropdown();
-    });
-    
-    // Setup Nutrition Chart using Chart.js
-    function setupNutritionChart() {
-      const ctx = document.getElementById('nutritionChart').getContext('2d');
-      const data = {
-        labels: ['Carbs', 'Protein', 'Fats'],
-        datasets: [{
-          data: [defaultNutrition.carbs, defaultNutrition.protein, defaultNutrition.fats],
-          backgroundColor: ['#FF9800', '#4CAF50', '#F44336']
-        }]
-      };
-      const options = {
-        responsive: true,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return context.label + ": " + context.parsed + "g";
-              }
-            }
-          }
-        }
-      };
-      new Chart(ctx, {
-        type: 'pie',
-        data: data,
-        options: options
-      });
-    }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      setupNutritionChart();
     });
   </script>
 </body>
