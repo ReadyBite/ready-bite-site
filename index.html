@@ -1,90 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ready Bite</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      text-align: center; 
-      background-color: #f5f5f5; 
-      color: #333; 
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      color: #333;
     }
-    .meal-container { 
-      display: flex; 
-      flex-wrap: wrap; 
-      justify-content: center; 
-      gap: 20px; 
+    .meal-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
     }
-    .meal { 
-      border: 1px solid #ccc; 
-      padding: 10px; 
-      width: 200px; 
-      background-color: #fff; 
+    .meal {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 200px;
+      background-color: #fff;
     }
-    .meal img { 
-      width: 150px; 
-      height: 150px; 
-      object-fit: cover; 
-      border-radius: 10px; 
+    .meal img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
     }
-    .cart { 
-      margin-top: 20px; 
-      background-color: #333; 
-      color: white; 
-      padding: 15px; 
-      border-radius: 5px; 
+    .cart {
+      margin-top: 20px;
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
     }
-    .hidden { 
-      display: none; 
-    }
-    .feedback-section { 
-      margin-top: 50px; 
-      padding: 20px; 
-      background-color: #e8e8e8; 
-      text-align: left; 
-      max-width: 800px; 
-      margin-left: auto; 
-      margin-right: auto; 
+    .feedback-section {
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #e8e8e8;
+      text-align: left;
+      max-width: 800px;
+      margin: 20px auto;
     }
     /* Modal styles */
-    .modal { 
-      display: none; 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%, -50%); 
-      background: white; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.5); 
-      z-index: 1000; 
-      width: 300px;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+      z-index: 1000;
+      width: 320px;
+      text-align: left;
     }
-    .modal input { 
-      width: 100%; 
-      padding: 8px; 
-      margin-top: 5px; 
+    .modal input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
       margin-bottom: 10px;
     }
-    .modal button { 
-      margin-top: 10px; 
-      background-color: #28a745; 
-      color: white; 
-      padding: 10px; 
-      border: none; 
-      cursor: pointer; 
+    .modal button {
+      margin-top: 10px;
+      background-color: #28a745;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
       width: 100%;
     }
-    button { 
-      background-color: #555; 
-      color: white; 
-      border: none; 
-      padding: 10px; 
-      cursor: pointer; 
+    button {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
     }
-    /* Optional overlay for modal */
+    /* Modal overlay */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -95,12 +92,29 @@
       background: rgba(0,0,0,0.5);
       z-index: 999;
     }
+    /* Order summary styling inside modal */
+    #orderSummary {
+      text-align: left;
+      background: #f8f8f8;
+      padding: 10px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+    /* Privacy notice */
+    .privacy-notice {
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>Ready Bite</h1>
   <nav>
-    <a href="index.html">Home</a> | <a href="about.html">About Us</a> | <a href="how-it-works.html">How It Works</a>
+    <a href="index.html">Home</a> | 
+    <a href="about.html">About Us</a> | 
+    <a href="how-it-works.html">How It Works</a>
   </nav>
   <div class="meal-container" id="mealContainer"></div>
   <div class="cart">
@@ -155,6 +169,19 @@
       
       <label for="customerZip">ZIP:</label>
       <input type="text" id="customerZip" name="customerZip" required>
+      
+      <label for="promoCode">Promotional Code:</label>
+      <input type="text" id="promoCode" name="promoCode">
+      
+      <!-- Order Summary and Payment Info -->
+      <h3>Order Summary</h3>
+      <pre id="orderSummary"></pre>
+      <p><strong>Payment:</strong> Venmo @Matt-Hanson-117 (Cash accepted if needed)</p>
+      
+      <!-- Privacy Notice -->
+      <p class="privacy-notice">
+        Your privacy is important. We do not share or sell your personal data.
+      </p>
       
       <button type="submit">Submit Order</button>
     </form>
@@ -217,7 +244,6 @@
       const totalPriceElement = document.getElementById("totalPrice");
       cartList.innerHTML = "";
       let total = 0;
-
       cart.forEach(item => {
         total += item.price * item.quantity;
         let li = document.createElement("li");
@@ -227,23 +253,35 @@
       totalPriceElement.innerText = total.toFixed(2);
     }
 
+    // Update order summary text in the modal
+    function updateOrderSummary() {
+      let summary = "";
+      cart.forEach(item => {
+        summary += `${item.quantity} x ${item.name} - $${(item.price * item.quantity).toFixed(2)}\n`;
+      });
+      summary += `\nTotal: $${document.getElementById("totalPrice").innerText}`;
+      document.getElementById("orderSummary").innerText = summary;
+    }
+
     function submitOrder() {
       if (cart.length === 0) {
         alert("Your cart is empty. Add meals before submitting an order.");
         return;
       }
-      // Display the modal and its overlay
+      // Update summary before showing modal
+      updateOrderSummary();
+      // Display the modal and overlay
       document.getElementById("orderModal").style.display = "block";
       document.getElementById("modalOverlay").style.display = "block";
     }
 
-    // Close modal when clicking outside of it (overlay click)
+    // Close modal when clicking outside (overlay click)
     document.getElementById("modalOverlay").addEventListener("click", function() {
       document.getElementById("orderModal").style.display = "none";
       document.getElementById("modalOverlay").style.display = "none";
     });
 
-    // Handle order form submission inside the modal
+    // Handle order form submission
     document.getElementById("orderForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const customerFirstName = document.getElementById("customerFirstName").value.trim();
@@ -254,6 +292,7 @@
       const customerCity = document.getElementById("customerCity").value.trim();
       const customerState = document.getElementById("customerState").value.trim();
       const customerZip = document.getElementById("customerZip").value.trim();
+      const promoCode = document.getElementById("promoCode").value.trim();
 
       if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail ||
           !customerStreet || !customerCity || !customerState || !customerZip) {
@@ -265,13 +304,26 @@
       const fullAddress = `${customerStreet}, ${customerCity}, ${customerState} ${customerZip}`;
       const orderDetails = cart.map(item => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`).join("\n");
       const totalPrice = document.getElementById("totalPrice").innerText;
-      const message = `Name: ${fullName}\nPhone: ${customerPhone}\nEmail: ${customerEmail}\nAddress: ${fullAddress}\n\nOrder List:\n${orderDetails}\n\nTotal: $${totalPrice}\n\nPayment via Venmo: @Matt-Hanson-107`;
+      
+      // Build the order message with payment info and promo code if provided
+      const message = 
+        `Name: ${fullName}\n` +
+        `Phone: ${customerPhone}\n` +
+        `Email: ${customerEmail}\n` +
+        `Address: ${fullAddress}\n` +
+        `Promo Code: ${promoCode || "N/A"}\n\n` +
+        `Order List:\n${orderDetails}\n\n` +
+        `Total: $${totalPrice}\n\n` +
+        `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
 
+      // Send the email via Formspree. Including a "replyto" field so the customer gets a confirmation.
       fetch('https://formspree.io/f/xwplpgbp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: 'readybitemeals@gmail.com',
+          replyto: customerEmail,
+          subject: 'Your Order Confirmation',
           message: message
         })
       })
@@ -280,10 +332,9 @@
         alert("Your order has been received! A confirmation email has been sent.");
         cart = [];
         updateCart();
-        // Hide the modal and overlay
+        // Hide modal and overlay and reset form
         document.getElementById("orderModal").style.display = "none";
         document.getElementById("modalOverlay").style.display = "none";
-        // Reset the form fields
         document.getElementById("orderForm").reset();
       })
       .catch(error => {
