@@ -12,12 +12,15 @@
       background-color: #f5f5f5;
       color: #333;
     }
+    /* Header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 50px;
+      padding: 10px 20px;
       background-color: #eeeeee;
+      width: 100%;
+      box-sizing: border-box;
       position: relative;
     }
     .company-name {
@@ -54,16 +57,16 @@
       display: none;
       position: absolute;
       top: 60px;
-      left: 50px;
+      left: 0;
+      width: 100%;
       background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      border-top: 1px solid #ccc;
       box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
       z-index: 1000;
     }
     .mobile-menu a {
       display: block;
-      padding: 10px;
+      padding: 10px 20px;
       text-decoration: none;
       color: #333;
       border-bottom: 1px solid #eee;
@@ -71,7 +74,7 @@
     .mobile-menu a:last-child {
       border-bottom: none;
     }
-    /* Global Cart Dropdown */
+    /* Cart Dropdown */
     .cart-dropdown {
       background-color: #4CAF50;
       color: white;
@@ -106,17 +109,6 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
-    /* Nutrition Banner */
-    .nutrition-banner {
-      background-color: #ddd;
-      color: #333;
-      width: 100%;
-      text-align: center;
-      padding: 4px 0;
-      font-size: 0.9em;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
     /* Meal Grid */
     .meal-container {
       display: grid;
@@ -124,6 +116,7 @@
       gap: 20px;
       justify-items: center;
       padding: 20px;
+      box-sizing: border-box;
     }
     @media (max-width: 768px) {
       .meal-container {
@@ -142,48 +135,66 @@
       border: 1px solid #ccc;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
       width: 220px;
-      padding: 10px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative; /* for overlay positioning */
+      cursor: pointer;    /* entire box is clickable */
+      transition: transform 0.2s;
+    }
+    .meal:hover {
+      transform: scale(1.02);
     }
     .meal img {
-      width: 200px;
-      height: 200px;
+      width: 220px;
+      height: 220px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 0;
     }
-    .meal h3 {
-      margin: 10px 0 5px 0;
+    /* Overlay that appears on hover (desktop only) */
+    @media (hover: hover) {
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 220px;
+        height: 220px;
+        background-color: rgba(128,128,128,0.5); /* slightly translucent grey */
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+      }
+      .meal:hover .overlay {
+        opacity: 1;
+      }
+    }
+    .overlay h3 {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .overlay p {
+      margin: 3px 0;
+      font-weight: normal;
+    }
+    .meal-info {
+      padding: 10px;
       text-align: center;
     }
-    .meal p {
+    .meal-info h3 {
+      margin: 10px 0 5px 0;
+      text-align: center;
+      font-size: 1em;
+    }
+    .meal-info p {
       margin: 5px 0;
-    }
-    .button-container {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-      width: 100%;
-    }
-    .button-container button {
-      flex: 1;
-      padding: 8px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    /* Hidden quantity input and add button (for Quick Add) */
-    .hidden-qty {
-      display: none;
-      margin-top: 5px;
-    }
-    .qty-message {
-      color: #c00;
       font-size: 0.9em;
-      margin-top: 5px;
-      display: none;
     }
     /* Cart Section */
     .cart-section {
@@ -212,11 +223,11 @@
       cursor: pointer;
       border-radius: 3px;
     }
-    .feedback-button-container {
+    .feedback-button-container, .contact-button-container {
       text-align: center;
-      margin: 40px 0;
+      margin: 40px 0 0 0;
     }
-    .feedback-button-container button {
+    .feedback-button-container button, .contact-button-container button {
       background-color: #4CAF50;
       color: white;
       border: none;
@@ -224,19 +235,7 @@
       font-size: 1.2em;
       cursor: pointer;
       border-radius: 5px;
-    }
-    .contact-button-container {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .contact-button-container button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1.2em;
-      cursor: pointer;
-      border-radius: 5px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -286,17 +285,72 @@
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
-    // Sample meals array
+    // Sample meals array with macros & shortDesc for overlay
     const meals = [
-      { name: "Beef Spaghetti", price: 10, image: "spaghetti_adjusted_cropped_resized.png" },
-      { name: "Asian Chicken and Rice w/ Veggie Mix", price: 10, image: "asian_chicken_adjusted_cropped_resized.png" },
-      { name: "Bulgogi Beef and Rice w/ Veggie Mix", price: 10, image: "bulgogi_beef_adjusted_cropped_resized.png.png" },
-      { name: "Beef Enchiladas", price: 10, image: "beef_enchiladas_adjusted_cropped_resized.png" },
-      { name: "Chicken Enchiladas", price: 10, image: "chicken_enchiladas_adjusted_cropped_resized.png" },
-      { name: "Chicken Alfredo", price: 10, image: "chicken_alfredo_adjusted_cropped_resized.png" },
-      { name: "Smoked BBQ Chicken w/ Potatoes", price: 10, image: "smoked_chicken_adjusted_cropped_resized.png" },
-      { name: "Chicken Fajita", price: 10, image: "chicken_fajita_adjusted_cropped_resized.png" },
-      { name: "Smoked BBQ Chicken Bulk", price: 12, bulkOptions: [2, 4, 6, 8, 10], image: "smoked_chicken_adjusted_cropped_resized.png" }
+      {
+        name: "Beef Spaghetti",
+        price: 10,
+        image: "spaghetti_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Rich beef sauce over spaghetti noodles."
+      },
+      {
+        name: "Asian Chicken and Rice w/ Veggie Mix",
+        price: 10,
+        image: "asian_chicken_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Savory sauce with chicken and mixed veggies."
+      },
+      {
+        name: "Bulgogi Beef and Rice w/ Veggie Mix",
+        price: 10,
+        image: "bulgogi_beef_adjusted_cropped_resized.png.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Marinated bulgogi beef with stir-fried vegetables."
+      },
+      {
+        name: "Beef Enchiladas",
+        price: 10,
+        image: "beef_enchiladas_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Spicy sauce, melted cheese, and tender beef."
+      },
+      {
+        name: "Chicken Enchiladas",
+        price: 10,
+        image: "chicken_enchiladas_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Melted cheese and seasoned chicken in tortillas."
+      },
+      {
+        name: "Chicken Alfredo",
+        price: 10,
+        image: "chicken_alfredo_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Creamy alfredo sauce with tender chicken."
+      },
+      {
+        name: "Smoked BBQ Chicken w/ Potatoes",
+        price: 10,
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Smoked chicken with seasoned potatoes."
+      },
+      {
+        name: "Chicken Fajita",
+        price: 10,
+        image: "chicken_fajita_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Bell peppers, onions, and seasoned chicken."
+      },
+      {
+        name: "Smoked BBQ Chicken Bulk",
+        price: 12,
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        macros: "500 Cal, 20g Fat, 40g Carbs, 40g Protein",
+        shortDesc: "Bulk smoked BBQ chicken with special seasoning.",
+        bulkOptions: [2, 4, 6, 8, 10]
+      }
     ];
     
     let cart = [];
@@ -307,72 +361,32 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
-        // Nutrition banner at top of each meal card
-        const nutritionBanner = `<div class="nutrition-banner">Cal: 500 F: 20g C:40g P:40g</div>`;
-        // For Quick Add: initially hide quantity input and Add button
-        let qtyControl = meal.bulkOptions 
-          ? `<select id="qtySelect-${index}" class="hidden-qty"> 
-               ${meal.bulkOptions.map(option => `<option value="${option}">${option} lbs</option>`).join('')} 
-             </select>`
-          : `<input type="number" id="qtyInput-${index}" min="1" class="hidden-qty" value="1">`;
+        mealDiv.onclick = function() {
+          viewDetails(index);
+        };
         
+        // Basic image plus hidden overlay
         mealDiv.innerHTML = `
-          ${nutritionBanner}
           <img src="${meal.image}" alt="${meal.name}">
-          <h3>${meal.name}</h3>
-          <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
-          <div class="button-container">
-            <button onclick="showQtySection(${index})">Quick Add</button>
-            <button onclick="viewDetails(${index})">View Details</button>
+          <div class="overlay">
+            <h3>${meal.name}</h3>
+            <p>${meal.macros}</p>
+            <p>${meal.shortDesc}</p>
           </div>
-          <p id="qtyMessage-${index}" class="qty-message">Select quantity</p>
-          ${qtyControl}
-          <button id="addBtn-${index}" class="hidden-qty" onclick="quickAdd(${index})">Add</button>
+          <div class="meal-info">
+            <h3>${meal.name}</h3>
+            <p>$${meal.price.toFixed(2)}${meal.bulkOptions ? "/lb" : ""}</p>
+          </div>
         `;
+        
         container.appendChild(mealDiv);
       });
     }
     
-    // Show quantity input and Add button when Quick Add is clicked
-    function showQtySection(index) {
-      document.getElementById(`qtyMessage-${index}`).style.display = "block";
-      const selectEl = document.getElementById(`qtySelect-${index}`);
-      const inputEl = document.getElementById(`qtyInput-${index}`);
-      const addBtn = document.getElementById(`addBtn-${index}`);
-      if (selectEl) selectEl.style.display = "inline-block";
-      if (inputEl) inputEl.style.display = "inline-block";
-      addBtn.style.display = "inline-block";
-    }
-    
-    // Quick Add: add item to cart and then hide the quantity controls
+    // Cart Functions
     function quickAdd(index) {
-      const meal = meals[index];
-      let quantity = 1;
-      const selectEl = document.getElementById(`qtySelect-${index}`);
-      const inputEl = document.getElementById(`qtyInput-${index}`);
-      if (selectEl && selectEl.style.display !== "none") {
-        quantity = parseInt(selectEl.value);
-      } else if (inputEl && inputEl.style.display !== "none") {
-        quantity = parseInt(inputEl.value);
-      }
-      if (isNaN(quantity) || quantity <= 0) quantity = 1;
-      
-      const existingItem = cart.find(item => item.name === meal.name);
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.push({ name: meal.name, price: meal.price, quantity: quantity });
-      }
-      updateCart();
-      updateCartDropdown();
-      alert("Added to cart!");
-      // Hide quantity controls after adding
-      document.getElementById(`qtyMessage-${index}`).style.display = "none";
-      if (selectEl) selectEl.style.display = "none";
-      if (inputEl) inputEl.style.display = "none";
-      document.getElementById(`addBtn-${index}`).style.display = "none";
+      // Not used in overlay approach, but if you want Quick Add separate, you can implement here
     }
-    
     function updateCart() {
       const cartList = document.getElementById("cartList");
       const totalPriceElement = document.getElementById("totalPrice");
@@ -387,30 +401,15 @@
       totalPriceElement.innerText = total.toFixed(2);
       localStorage.setItem("cartData", JSON.stringify(cart));
     }
-    
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCart();
       updateCartDropdown();
     }
-    
-    function viewDetails(index) {
-      window.location.href = "product.html?id=" + index;
-    }
-    
-    function goToOrderPage() {
-      window.location.href = "order.html";
-    }
-    
-    function sendFeedback() {
-      alert("Feedback submitted. Thank you!");
-    }
-    
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
     }
-    
     function updateCartDropdown() {
       const loadedCart = loadCart();
       let totalItems = 0;
@@ -430,6 +429,16 @@
           cartDropdownList.appendChild(li);
         });
       }
+    }
+    function viewDetails(index) {
+      window.location.href = "product.html?id=" + index;
+    }
+    function goToOrderPage() {
+      window.location.href = "order.html";
+    }
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobileMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
     document.addEventListener("DOMContentLoaded", function() {
