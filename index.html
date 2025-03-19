@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ready Bite - Main</title>
   <style>
@@ -174,12 +174,18 @@
       cursor: pointer;
       border-radius: 3px;
     }
-    .feedback-section {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #e8e8e8;
-      text-align: left;
+    .feedback-button-container {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .feedback-button-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -210,20 +216,9 @@
     <button onclick="goToOrderPage()">Go to Checkout</button>
   </div>
   
-  <div class="feedback-section">
-    <h2>Feedback</h2>
-    <p>We value your feedback! Please let us know how we can improve.</p>
-    <label for="feedbackMessage">General Feedback:</label>
-    <textarea id="feedbackMessage" rows="4" style="width: 100%;" placeholder="Enter your feedback here..."></textarea>
-    <label for="rating">Rate your experience (1-5):</label>
-    <select id="rating">
-      <option value="1">1 - Poor</option>
-      <option value="2">2 - Fair</option>
-      <option value="3">3 - Good</option>
-      <option value="4">4 - Very Good</option>
-      <option value="5" selected>5 - Excellent</option>
-    </select>
-    <button onclick="sendFeedback()">Submit Feedback</button>
+  <!-- New Feedback Button at Bottom -->
+  <div class="feedback-button-container">
+    <button onclick="window.location.href='feedback.html'">Leave Us Feedback</button>
   </div>
   
   <script>
