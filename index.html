@@ -130,66 +130,86 @@
         display: block;
       }
     }
+    /* Meal Card */
     .meal {
+      position: relative;
+      width: 220px;
+      /* entire card is clickable */
+      cursor: pointer;
       background-color: #fff;
       border: 1px solid #ccc;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-      width: 220px;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative; /* for overlay positioning */
-      cursor: pointer;    /* entire box is clickable */
       transition: transform 0.2s;
     }
     .meal:hover {
       transform: scale(1.02);
     }
-    .meal img {
+    /* Always show the banner at the top */
+    .nutrition-banner {
+      width: 220px;
+      background-color: #ddd;
+      text-align: center;
+      font-size: 0.9em;
+      font-weight: bold;
+      padding: 4px 0;
+    }
+    .image-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      overflow: hidden;
+    }
+    .image-container img {
       width: 220px;
       height: 220px;
       object-fit: cover;
-      border-radius: 0;
+      display: block;
     }
-    /* Overlay that appears on hover (desktop only) */
+    /* Desktop Hover Overlay */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 220px;
+      background-color: rgba(128,128,128,0.5);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      padding: 10px;
+      box-sizing: border-box;
+    }
     @media (hover: hover) {
-      .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 220px;
-        height: 220px;
-        background-color: rgba(128,128,128,0.5); /* slightly translucent grey */
-        color: #fff;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 10px;
-      }
       .meal:hover .overlay {
         opacity: 1;
       }
     }
+    /* Hide overlay on mobile entirely */
+    @media (max-width: 768px) {
+      .overlay {
+        display: none;
+      }
+    }
     .overlay h3 {
-      font-weight: bold;
       margin-bottom: 5px;
+      font-weight: bold;
     }
     .overlay p {
       margin: 3px 0;
       font-weight: normal;
     }
+    /* Basic meal info below image */
     .meal-info {
-      padding: 10px;
       text-align: center;
+      padding: 10px;
     }
     .meal-info h3 {
-      margin: 10px 0 5px 0;
-      text-align: center;
+      margin: 5px 0;
       font-size: 1em;
     }
     .meal-info p {
@@ -361,17 +381,22 @@
       meals.forEach((meal, index) => {
         const mealDiv = document.createElement("div");
         mealDiv.className = "meal";
+        // Entire .meal is clickable
         mealDiv.onclick = function() {
           viewDetails(index);
         };
         
-        // Basic image plus hidden overlay
         mealDiv.innerHTML = `
-          <img src="${meal.image}" alt="${meal.name}">
-          <div class="overlay">
-            <h3>${meal.name}</h3>
-            <p>${meal.macros}</p>
-            <p>${meal.shortDesc}</p>
+          <div class="nutrition-banner">
+            Cal: 500 F: 20g C:40g P:40g
+          </div>
+          <div class="image-container">
+            <img src="${meal.image}" alt="${meal.name}">
+            <div class="overlay">
+              <h3>${meal.name}</h3>
+              <p>${meal.macros}</p>
+              <p>${meal.shortDesc}</p>
+            </div>
           </div>
           <div class="meal-info">
             <h3>${meal.name}</h3>
@@ -384,9 +409,6 @@
     }
     
     // Cart Functions
-    function quickAdd(index) {
-      // Not used in overlay approach, but if you want Quick Add separate, you can implement here
-    }
     function updateCart() {
       const cartList = document.getElementById("cartList");
       const totalPriceElement = document.getElementById("totalPrice");
@@ -435,10 +457,6 @@
     }
     function goToOrderPage() {
       window.location.href = "order.html";
-    }
-    function toggleMobileMenu() {
-      const menu = document.getElementById("mobileMenu");
-      menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
     
     document.addEventListener("DOMContentLoaded", function() {
