@@ -66,10 +66,8 @@
   </style>
 </head>
 <body>
-  <!-- Optional links to navigate back -->
   <div class="nav-links">
     <a href="main.html">Back to Main</a>
-    <!-- Add other links if you want -->
   </div>
   
   <h1>Ready Bite</h1>
@@ -192,7 +190,7 @@
           `Total: $${total.toFixed(2)}\n\n` +
           `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
 
-        // Send data to Formspree (update your formspree endpoint if needed)
+        // Updated fetch with logging to diagnose 404 errors
         fetch('https://formspree.io/f/xwplpgbp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -203,17 +201,24 @@
             message: message
           })
         })
-        .then(response => response.json())
+        .then(response => {
+          console.log('Response status:', response.status);
+          if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+          }
+          return response.json();
+        })
         .then(data => {
           alert("Your order has been received! A confirmation email has been sent.");
           // Clear cart and localStorage
           cart = [];
           localStorage.removeItem("cartData");
-          // Optionally redirect or show a thank you message
+          // Redirect back to main page (or show a thank you page)
           window.location.href = "main.html";
         })
         .catch(error => {
-          alert("Error sending order. Please try again.");
+          console.error('Fetch error:', error);
+          alert("Error sending order. Please try again. " + error);
         });
       });
     }
