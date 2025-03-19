@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ready Bite - Main</title>
   <style>
@@ -60,7 +60,6 @@
       border-radius: 5px;
       box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
       z-index: 1000;
-      width: 150px;
     }
     .mobile-menu a {
       display: block;
@@ -226,6 +225,19 @@
       cursor: pointer;
       border-radius: 5px;
     }
+    .contact-button-container {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .contact-button-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
@@ -259,8 +271,12 @@
     <button onclick="goToOrderPage()">Go to Checkout</button>
   </div>
   
+  <!-- Feedback and Contact Buttons -->
   <div class="feedback-button-container">
     <button onclick="window.location.href='feedback.html'">Leave Us Feedback</button>
+  </div>
+  <div class="contact-button-container">
+    <button onclick="window.location.href='contact.html'">Contact Us</button>
   </div>
   
   <script>
