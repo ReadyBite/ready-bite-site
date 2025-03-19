@@ -156,7 +156,6 @@
       const quantityInput = document.getElementById(`meal-${index}`);
       let quantity = parseInt(quantityInput.value);
       if (isNaN(quantity) || quantity <= 0) return;
-
       let meal = meals[index];
       let existingItem = cart.find(item => item.name === meal.name);
       if (existingItem) {
@@ -200,7 +199,6 @@
       alert("Feedback submitted. Thank you!");
     }
 
-    // Initialize
     renderMeals();
   </script>
 </body>
