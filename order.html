@@ -69,6 +69,9 @@
       margin-bottom: 5px;
       font-size: 0.9em;
     }
+    h1, h2 {
+      text-align: center;
+    }
     .order-container {
       max-width: 600px;
       margin: 20px auto;
@@ -109,22 +112,11 @@
       width: 100%;
       font-size: 1em;
     }
-    .cart-section ul {
-      list-style: none;
-      padding: 0;
-    }
-    .cart-section li {
+    .error-message {
+      color: #c00;
+      font-weight: bold;
+      margin-top: 10px;
       margin-bottom: 10px;
-      font-size: 1em;
-    }
-    .cart-section li button {
-      margin-left: 10px;
-      background-color: #c00;
-      border: none;
-      color: white;
-      padding: 2px 6px;
-      cursor: pointer;
-      border-radius: 3px;
     }
   </style>
 </head>
@@ -151,6 +143,8 @@
   
   <div class="order-container">
     <h3>Your Cart</h3>
+    <!-- If the user fails to fill out all required fields, show an error message here -->
+    <div id="errorMsg" class="error-message" style="display:none;">Please fill out all required fields</div>
     <div id="cartSummary" class="order-summary"></div>
     
     <!-- Checkout Form -->
@@ -181,9 +175,12 @@
       
       <label for="promoCode">Promotional Code (optional):</label>
       <input type="text" id="promoCode">
-      
+
+      <!-- Payment Checkbox/Radio -->
       <h3>Payment</h3>
-      <p>Venmo @Matt-Hanson-117 (Cash accepted if needed)</p>
+      <p>Select Payment Method:</p>
+      <label><input type="radio" name="paymentMethod" value="venmo" checked> Venmo</label>
+      <label><input type="radio" name="paymentMethod" value="cash"> Cash</label>
       
       <p class="privacy-notice">
         Your privacy is important. We do not share or sell your personal data.
@@ -194,8 +191,7 @@
   </div>
   
   <script>
-    let cart = [];
-    
+    // Cart management
     function loadCart() {
       const savedCart = localStorage.getItem("cartData");
       return savedCart ? JSON.parse(savedCart) : [];
@@ -250,18 +246,36 @@
       window.location.href = "order.html";
     }
     
-    function removeFromCart(index) {
-      let loadedCart = loadCart();
-      loadedCart.splice(index, 1);
-      saveCart(loadedCart);
-      updateCartSummary();
-      updateCartDropdown();
-    }
-    
     function setupFormSubmission() {
       const form = document.getElementById("checkoutForm");
       form.addEventListener("submit", function(e) {
         e.preventDefault();
+        
+        // If any required field is empty, show the error message
+        const requiredFields = [
+          "customerFirstName",
+          "customerLastName",
+          "customerPhone",
+          "customerEmail",
+          "customerStreet",
+          "customerCity",
+          "customerState",
+          "customerZip"
+        ];
+        let allFilled = true;
+        requiredFields.forEach(id => {
+          const val = document.getElementById(id).value.trim();
+          if (!val) {
+            allFilled = false;
+          }
+        });
+        if (!allFilled) {
+          document.getElementById("errorMsg").style.display = "block";
+          return;
+        } else {
+          document.getElementById("errorMsg").style.display = "none";
+        }
+        
         const customerFirstName = document.getElementById("customerFirstName").value.trim();
         const customerLastName = document.getElementById("customerLastName").value.trim();
         const customerPhone = document.getElementById("customerPhone").value.trim();
@@ -272,11 +286,8 @@
         const customerZip = document.getElementById("customerZip").value.trim();
         const promoCode = document.getElementById("promoCode").value.trim();
         
-        if (!customerFirstName || !customerLastName || !customerPhone || !customerEmail ||
-            !customerStreet || !customerCity || !customerState || !customerZip) {
-          alert("Please fill out all required fields.");
-          return;
-        }
+        // Payment method
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
         
         let orderDetails = "";
         let total = 0;
@@ -285,50 +296,3 @@
           const itemTotal = item.price * item.quantity;
           total += itemTotal;
           orderDetails += `${item.quantity}x ${item.name} - $${itemTotal.toFixed(2)}\n`;
-        });
-        
-        const message = 
-          `Name: ${customerFirstName} ${customerLastName}\n` +
-          `Phone: ${customerPhone}\n` +
-          `Email: ${customerEmail}\n` +
-          `Address: ${customerStreet}, ${customerCity}, ${customerState} ${customerZip}\n` +
-          `Promo Code: ${promoCode || "N/A"}\n\n` +
-          `Order List:\n${orderDetails}\n\n` +
-          `Total: $${total.toFixed(2)}\n\n` +
-          `Payment: Venmo @Matt-Hanson-117 (Cash accepted if needed)`;
-        
-        fetch('https://formspree.io/f/xwplpgbp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: 'readybitemeals@gmail.com',
-            replyto: customerEmail,
-            subject: 'Your Order Confirmation',
-            message: message
-          })
-        })
-        .then(response => {
-          if (!response.ok) {
-            return response.text().then(text => { throw new Error(text); });
-          }
-          return response.json();
-        })
-        .then(data => {
-          alert("Your order has been received! A confirmation email has been sent.");
-          localStorage.removeItem("cartData");
-          window.location.href = "index.html";
-        })
-        .catch(error => {
-          alert("Error sending order. Please try again. " + error);
-        });
-      });
-    }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-      updateCartDropdown();
-      updateCartSummary();
-      setupFormSubmission();
-    });
-  </script>
-</body>
-</html>
