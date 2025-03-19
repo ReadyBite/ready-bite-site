@@ -20,7 +20,7 @@
       color: #333;
       margin: 0 10px;
     }
-    /* Cart Dropdown (global) */
+    /* Global Cart Dropdown */
     .cart-dropdown {
       position: fixed;
       top: 10px;
@@ -174,7 +174,12 @@
     
     function updateCartDropdown() {
       const loadedCart = loadCart();
-      document.getElementById("cartCount").innerText = loadedCart.length;
+      // Sum the total quantity across all meal types
+      let totalItems = 0;
+      loadedCart.forEach(item => {
+        totalItems += item.quantity;
+      });
+      document.getElementById("cartCount").innerText = totalItems;
       const cartDropdownList = document.getElementById("cartDropdownList");
       cartDropdownList.innerHTML = "";
       const displayItems = loadedCart.slice(0, 4);
