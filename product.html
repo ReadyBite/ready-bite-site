@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ready Bite - Product Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .nav-links {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+    }
+    .product-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .product-image img {
+      max-width: 300px;
+      width: 100%;
+      border-radius: 10px;
+    }
+    .product-info {
+      margin-left: 20px;
+      text-align: left;
+      max-width: 500px;
+    }
+    .product-info h2 {
+      margin: 0 0 10px 0;
+      font-weight: bold;
+    }
+    .product-details {
+      text-align: left;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .product-details h3 {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-links">
+    <a href="main.html">Back to Main</a>
+  </div>
+  <div id="productContent">
+    <!-- Product details will be inserted here by JavaScript -->
+  </div>
+  <script>
+    // Sample meals array with extra details for all 9 products
+    const meals = [
+      {
+        name: "Beef Spaghetti",
+        price: 10,
+        image: "spaghetti_adjusted_cropped_resized.png",
+        description: "A hearty spaghetti dish with rich beef sauce.",
+        ingredients: "Beef, spaghetti, tomatoes, garlic, basil, oregano",
+        macros: "Calories: 600, Protein: 30g, Carbs: 80g, Fat: 20g"
+      },
+      {
+        name: "Asian Chicken and Rice w/ Veggie Mix",
+        price: 10,
+        image: "asian_chicken_adjusted_cropped_resized.png",
+        description: "Tender chicken with rice and vibrant veggies, tossed in a savory sauce.",
+        ingredients: "Chicken, rice, broccoli, carrots, bell peppers, soy sauce, ginger",
+        macros: "Calories: 550, Protein: 35g, Carbs: 70g, Fat: 15g"
+      },
+      {
+        name: "Bulgogi Beef and Rice w/ Veggie Mix",
+        price: 10,
+        image: "bulgogi_beef_adjusted_cropped_resized.png.png",
+        description: "Marinated bulgogi beef served over rice with a medley of stir-fried vegetables.",
+        ingredients: "Beef, rice, bell peppers, onions, soy sauce, sugar, garlic, sesame oil",
+        macros: "Calories: 650, Protein: 32g, Carbs: 85g, Fat: 22g"
+      },
+      {
+        name: "Beef Enchiladas",
+        price: 10,
+        image: "beef_enchiladas_adjusted_cropped_resized.png",
+        description: "Delicious beef enchiladas with spicy sauce and melted cheese.",
+        ingredients: "Beef, tortillas, cheese, enchilada sauce, onions, spices",
+        macros: "Calories: 650, Protein: 28g, Carbs: 50g, Fat: 30g"
+      },
+      {
+        name: "Chicken Enchiladas",
+        price: 10,
+        image: "chicken_enchiladas_adjusted_cropped_resized.png",
+        description: "Tasty chicken enchiladas with a hint of cumin and melted cheese.",
+        ingredients: "Chicken, tortillas, cheese, enchilada sauce, garlic, spices",
+        macros: "Calories: 630, Protein: 30g, Carbs: 45g, Fat: 28g"
+      },
+      {
+        name: "Chicken Alfredo",
+        price: 10,
+        image: "chicken_alfredo_adjusted_cropped_resized.png",
+        description: "Creamy chicken alfredo pasta with a rich, savory sauce.",
+        ingredients: "Chicken, pasta, cream, parmesan, garlic, butter",
+        macros: "Calories: 700, Protein: 35g, Carbs: 65g, Fat: 30g"
+      },
+      {
+        name: "Smoked BBQ Chicken w/ Potatoes",
+        price: 10,
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        description: "Smoked BBQ chicken served with crispy roasted potatoes.",
+        ingredients: "Chicken, potatoes, BBQ sauce, herbs, spices",
+        macros: "Calories: 680, Protein: 40g, Carbs: 55g, Fat: 25g"
+      },
+      {
+        name: "Chicken Fajita",
+        price: 10,
+        image: "chicken_fajita_adjusted_cropped_resized.png",
+        description: "Sizzling chicken fajitas with bell peppers and onions.",
+        ingredients: "Chicken, bell peppers, onions, spices, tortillas",
+        macros: "Calories: 600, Protein: 38g, Carbs: 40g, Fat: 20g"
+      },
+      {
+        name: "Smoked BBQ Chicken Bulk",
+        price: 12,
+        bulkOptions: [2, 4, 6, 8, 10],
+        image: "smoked_chicken_adjusted_cropped_resized.png",
+        description: "Bulk order of smoked BBQ chicken with special seasoning.",
+        ingredients: "Chicken, BBQ seasoning, potatoes, mixed veggies",
+        macros: "Calories: 750, Protein: 42g, Carbs: 60g, Fat: 28g"
+      }
+    ];
+
+    // Get the query parameter 'id' from the URL
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    const productContent = document.getElementById("productContent");
+
+    if (id === null || isNaN(id) || id < 0 || id >= meals.length) {
+      productContent.innerHTML = "<p>Product not found.</p>";
+    } else {
+      const meal = meals[id];
+      productContent.innerHTML = `
+        <div class="product-container">
+          <div class="product-image">
+            <img src="${meal.image}" alt="${meal.name}">
+          </div>
+          <div class="product-info">
+            <h2>${meal.name}</h2>
+            <p>${meal.description}</p>
+          </div>
+        </div>
+        <div class="product-details">
+          <h3>Ingredients</h3>
+          <p>${meal.ingredients}</p>
+          <h3>Nutrition Info</h3>
+          <p>${meal.macros}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
